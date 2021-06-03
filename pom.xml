@@ -20,24 +20,15 @@
 		<maven.compiler.target>${java.version}</maven.compiler.target>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
+
+		<version.lib.h2>1.4.200</version.lib.h2>
 	</properties>
 
-	<dependencyManagement>
-		<dependencies>
-			<dependency>
-				<groupId>com.github.spullara.mustache.java</groupId>
-				<artifactId>compiler</artifactId>
-				<version>0.9.7</version>
-			</dependency>
-			<dependency>
-				<groupId>io.r2dbc</groupId>
-				<artifactId>r2dbc-postgresql</artifactId>
-				<version>0.8.8.RELEASE</version>
-			</dependency>
-		</dependencies>
-	</dependencyManagement>
-
 	<dependencies>
+		<dependency>
+			<groupId>io.helidon.logging</groupId>
+			<artifactId>helidon-logging-jul</artifactId>
+		</dependency>
 		<dependency>
 			<groupId>io.helidon.microprofile.bundles</groupId>
 			<artifactId>helidon-microprofile-core</artifactId>
@@ -52,7 +43,6 @@
 		<dependency>
 			<groupId>com.h2database</groupId>
 			<artifactId>h2</artifactId>
-			<scope>runtime</scope>
 		</dependency>
 
 		<dependency>

@@ -4,6 +4,7 @@ import java.io.Serializable;
 import java.time.Instant;
 import java.util.Objects;
 
+import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.IdClass;
@@ -12,11 +13,32 @@ import javax.persistence.NamedQuery;
 @Entity
 @NamedQuery(
 	name = "Person.find",
-	query = "SELECT p FROM Person p WHERE p.name = :name ORDER BY p.inserted")
+	query = "SELECT p FROM Person p " +
+		"WHERE p.name = :name " +
+		"ORDER BY p.inserted DESC")
 @NamedQuery(
-	name = "Person.all",  // potentially poor performance
-	query = "SELECT p FROM Person p WHERE p.inserted = (" +
-		"SELECT MAX(p0.inserted) FROM Person p0 WHERE p0.name = p.name)")
+	name = "Person.find.instant",
+	query = "SELECT p FROM Person p " +
+		"WHERE p.name = :name " +
+		"AND p.inserted <= :instant " +
+		"ORDER BY p.inserted DESC")
+@NamedQuery(
+	name = "Person.all",
+	query = "SELECT p FROM Person p "
+		+"WHERE p.inserted = (" +
+			"SELECT MAX(p0.inserted) " +
+			"FROM Person p0 " +
+			"WHERE p0.name = p.name" +
+		")")
+@NamedQuery(
+	name = "Person.all.instant",
+	query = "SELECT p FROM Person p "
+		+"WHERE p.inserted = (" +
+			"SELECT MAX(p0.inserted) " +
+			"FROM Person p0 " +
+			"WHERE p0.name = p.name " +
+			"AND p0.inserted <= :instant " +
+		")")
 @NamedQuery(
 	name = "Person.allAudit",
 	query = "SELECT p FROM Person p")
@@ -25,6 +47,7 @@ public class Person implements Serializable {
 	@Id
 	private String name;
 	@Id
+	@Column(columnDefinition = "TIMESTAMP(9) WITH TIME ZONE")
 	private Instant inserted;
 
 	private int age;
@@ -66,11 +89,21 @@ public class Person implements Serializable {
 			this.age == other.age;
 	}
 
+
+	public PersonId toId() {
+		return new PersonId(this);
+	}
+
 	public static class PersonId implements Serializable {
 		private String name;
 		private Instant inserted;
 
 		public PersonId() {
+		}
+
+		private PersonId(Person person) {
+			this.name = person.name;
+			this.inserted = person.inserted;
 		}
 
 		public String getName() {
