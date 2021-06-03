@@ -36,23 +36,38 @@ class PersonResourceTest {
 		actual = webTarget.path("/persons").request().put(Entity.entity(person, MediaType.APPLICATION_JSON));
 		assertThat(actual.getStatus(), is(Status.OK.getStatusCode()));
 		var created0 = actual.readEntity(Person.class);
-		assertThat(created0.getCreated(), notNullValue());
+		assertThat(created0.getInserted(), notNullValue());
 
 		actual = webTarget.path("/persons").request().put(Entity.entity(person, MediaType.APPLICATION_JSON));
 		assertThat(actual.getStatus(), is(Status.OK.getStatusCode()));
 		var created1 = actual.readEntity(Person.class);
 		assertThat(created0, is(created1));
-		assertThat(created0.getCreated(), is(created1.getCreated()));
+		assertThat(created0.getInserted(), is(created1.getInserted()));
 
 		person.setAge(2);
 		actual = webTarget.path("/persons").request().put(Entity.entity(person, MediaType.APPLICATION_JSON));
 		assertThat(actual.getStatus(), is(Status.OK.getStatusCode()));
 		var created2 = actual.readEntity(Person.class);
 		assertThat(created0, is(not(created2)));
-		assertThat(created0.getCreated(), is(not(created2.getCreated())));
+		assertThat(created0.getInserted(), is(not(created2.getInserted())));
 
 		actual = webTarget.path("/persons/Bob/audit").request().get();
 		var audit = actual.readEntity(new GenericType<List<Person>>() {});
 		assertThat(audit, hasSize(2));
+
+		person.setName("Jane");
+		person.setAge(1);
+		actual = webTarget.path("/persons").request().put(Entity.entity(person, MediaType.APPLICATION_JSON));
+		assertThat(actual.getStatus(), is(Status.OK.getStatusCode()));
+		var created3 = actual.readEntity(Person.class);
+		assertThat(created0, is(not(created3)));
+
+		actual = webTarget.path("/persons").request().get();
+		var all = actual.readEntity(new GenericType<List<Person>>() {});
+		assertThat(all, hasSize(2));
+
+		actual = webTarget.path("/persons/audit").request().get();
+		var allAudit = actual.readEntity(new GenericType<List<Person>>() {});
+		assertThat(allAudit, hasSize(3));
 	}
 }

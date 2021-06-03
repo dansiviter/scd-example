@@ -17,6 +17,17 @@ public class PersonResource {
 	private PersonRepo repo;
 
 	@GET
+	public List<Person> all() {
+		return repo.all();
+	}
+
+	@GET
+	@Path("audit")
+	public List<Person> allAudit() {
+		return repo.allAudit();
+	}
+
+	@GET
 	@Path("{name}")
 	public Person get(@PathParam("name") String name) {
 		return repo.get(name);

@@ -10,13 +10,22 @@ import javax.persistence.IdClass;
 import javax.persistence.NamedQuery;
 
 @Entity
-@NamedQuery(name = "Person.find", query = "SELECT p FROM Person p WHERE p.name = :name ORDER BY p.created")
+@NamedQuery(
+	name = "Person.find",
+	query = "SELECT p FROM Person p WHERE p.name = :name ORDER BY p.inserted")
+@NamedQuery(
+	name = "Person.all",  // potentially poor performance
+	query = "SELECT p FROM Person p WHERE p.inserted = (" +
+		"SELECT MAX(p0.inserted) FROM Person p0 WHERE p0.name = p.name)")
+@NamedQuery(
+	name = "Person.allAudit",
+	query = "SELECT p FROM Person p")
 @IdClass(Person.PersonId.class)
 public class Person implements Serializable {
 	@Id
 	private String name;
 	@Id
-	private Instant created;
+	private Instant inserted;
 
 	private int age;
 
@@ -28,12 +37,12 @@ public class Person implements Serializable {
 		this.name = name;
 	}
 
-	public Instant getCreated() {
-		return created;
+	public Instant getInserted() {
+		return inserted;
 	}
 
-	public void setCreated(Instant created) {
-		this.created = created;
+	public void setInserted(Instant inserted) {
+		this.inserted = inserted;
 	}
 
 	public int getAge() {
@@ -59,7 +68,7 @@ public class Person implements Serializable {
 
 	public static class PersonId implements Serializable {
 		private String name;
-		private Instant created;
+		private Instant inserted;
 
 		public PersonId() {
 		}
@@ -72,12 +81,12 @@ public class Person implements Serializable {
 			this.name = name;
 		}
 
-		public Instant getCreated() {
-			return created;
+		public Instant getInserted() {
+			return inserted;
 		}
 
-		public void setCreated(Instant created) {
-			this.created = created;
+		public void setInserted(Instant inserted) {
+			this.inserted = inserted;
 		}
 
 		@Override
@@ -89,12 +98,12 @@ public class Person implements Serializable {
 				return false;
 			}
 			var other = (PersonId) obj;
-			return Objects.equals(this.name, other.name) && Objects.equals(this.created, other.created);
+			return Objects.equals(this.name, other.name) && Objects.equals(this.inserted, other.inserted);
 		}
 
 		@Override
 		public int hashCode() {
-			return Objects.hash(this.name, this.created);
+			return Objects.hash(this.name, this.inserted);
 		}
 	}
 }

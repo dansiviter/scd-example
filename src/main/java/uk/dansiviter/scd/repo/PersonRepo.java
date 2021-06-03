@@ -17,6 +17,15 @@ public class PersonRepo {
 	@PersistenceContext
 	private EntityManager em;
 
+	public List<Person> all() {
+		return em.createNamedQuery("Person.all", Person.class).getResultList();
+	}
+
+	public List<Person> allAudit() {
+		return em.createNamedQuery("Person.allAudit", Person.class).getResultList();
+
+	}
+
 	private TypedQuery<Person> baseGet(String name) {
 		return em.createNamedQuery("Person.find", Person.class)
 			.setParameter("name", name);
@@ -40,7 +49,7 @@ public class PersonRepo {
 		if (person.equals(prev)) {
 			return prev;
 		}
-		person.setCreated(Instant.now());
+		person.setInserted(Instant.now());
 		em.persist(person);
 		return person;
 	}
