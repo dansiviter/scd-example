@@ -1,8 +1,6 @@
 package uk.dansiviter.scd.repo;
 
-import static java.time.ZoneOffset.UTC;
-
-import java.time.Instant;
+import java.time.OffsetDateTime;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.time.ZoneOffset;
@@ -14,28 +12,26 @@ import org.h2.api.TimestampWithTimeZone;
 import org.h2.util.DateTimeUtils;
 
 @Converter(autoApply = true)
-public class InstantConverter implements AttributeConverter<Instant, TimestampWithTimeZone> {
+public class OffsetDateTimeConverter implements AttributeConverter<OffsetDateTime, TimestampWithTimeZone> {
 	@Override
-	public TimestampWithTimeZone convertToDatabaseColumn(Instant attribute) {
+	public TimestampWithTimeZone convertToDatabaseColumn(OffsetDateTime attribute) {
 		if (attribute == null) {
 			return null;
 		}
-		var dateTime = attribute.atZone(UTC);
-		var date = dateTime.toLocalDate();
-		var time = dateTime.toLocalTime();
+		var date = attribute.toLocalDate();
+		var time = attribute.toLocalTime();
 		var dateMillis = DateTimeUtils.dateValue(date.getYear(), date.getMonthValue(), date.getDayOfMonth());
-		return new TimestampWithTimeZone(dateMillis, time.toNanoOfDay(), dateTime.getOffset().getTotalSeconds());
+		return new TimestampWithTimeZone(dateMillis, time.toNanoOfDay(), attribute.getOffset().getTotalSeconds());
 	}
 
 	@Override
-	public Instant convertToEntityAttribute(TimestampWithTimeZone dbData) {
+	public OffsetDateTime convertToEntityAttribute(TimestampWithTimeZone dbData) {
 		if (dbData == null) {
 			return null;
 		}
 		var date = LocalDate.of(dbData.getYear(), dbData.getMonth(), dbData.getDay());
 		var time = LocalTime.ofNanoOfDay(dbData.getNanosSinceMidnight());
 		return date.atTime(time)
-			.atOffset(ZoneOffset.ofTotalSeconds(dbData.getTimeZoneOffsetSeconds()))
-			.toInstant();
+			.atOffset(ZoneOffset.ofTotalSeconds(dbData.getTimeZoneOffsetSeconds()));
 	}
 }
