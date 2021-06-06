@@ -8,32 +8,47 @@ import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.IdClass;
+import javax.persistence.NamedNativeQuery;
 import javax.persistence.NamedQuery;
 
 @Entity
 @NamedQuery(
 	name = "Person.find",
-	query = "SELECT p FROM Person p " +
+	query = "SELECT p " +
+		"FROM Person p " +
 		"WHERE p.name = :name " +
 		"ORDER BY p.inserted DESC")
 @NamedQuery(
 	name = "Person.find.instant",
-	query = "SELECT p FROM Person p " +
+	query = "SELECT p " +
+		"FROM Person p " +
 		"WHERE p.name = :name " +
 		"AND p.inserted <= :instant " +
 		"ORDER BY p.inserted DESC")
 @NamedQuery(
 	name = "Person.all",
-	query = "SELECT p FROM Person p "
-		+"WHERE p.inserted = (" +
+	query = "SELECT p " +
+		"FROM Person p " +
+		"WHERE p.inserted = (" +
 			"SELECT MAX(p0.inserted) " +
 			"FROM Person p0 " +
 			"WHERE p0.name = p.name" +
 		")")
+@NamedNativeQuery(
+	name = "Person.all.native",
+	query = "SELECT * " +
+		"FROM PERSON p " +
+		"WHERE (p.name, p.inserted) IN (" +
+			"SELECT p0.name, MAX(p0.inserted) " +
+			"FROM Person p0 " +
+			"GROUP BY p0.name" +
+	")",
+	resultClass = Person.class)
 @NamedQuery(
 	name = "Person.all.instant",
-	query = "SELECT p FROM Person p "
-		+"WHERE p.inserted = (" +
+	query = "SELECT p " +
+	  "FROM Person p " +
+		"WHERE p.inserted = (" +
 			"SELECT MAX(p0.inserted) " +
 			"FROM Person p0 " +
 			"WHERE p0.name = p.name " +
@@ -51,6 +66,14 @@ public class Person implements Serializable {
 	private Instant inserted;
 
 	private int age;
+
+	public Person() { }
+
+	public Person(String name, int age, Instant inserted) {
+		this.name = name;
+		this.age = age;
+		this.inserted = inserted;
+	}
 
 	public String getName() {
 		return name;

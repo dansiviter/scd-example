@@ -97,13 +97,13 @@ class PersonResourceTest {
 		// get latest persons
 		actual = webTarget.path("/persons").request().get();
 		var all = actual.readEntity(new GenericType<List<Person>>() {});
-		assertThat(all, hasSize(7));
+		assertThat(all, hasSize(8));
 		assertThat(all, hasItem(hasProperty("name", is("Jillian"))));
 		assertThat(all, hasItem(hasProperty("name", is("Glenn"))));
 
 		actual = webTarget.path("/persons/audit").request().get();
 		var allAudit = actual.readEntity(new GenericType<List<Person>>() {});
-		assertThat(allAudit, hasSize(8));
+		assertThat(allAudit, hasSize(9));
 
 		// check we can get value at a particular point in time (i.e. first one)
 		actual = webTarget.path("/persons/Glenn").queryParam("instant", created0.getInserted()).request().get();

@@ -21,7 +21,7 @@ public class PersonRepo {
 	public List<Person> all(Optional<Instant> instant) {
 		TypedQuery<Person> query = instant
 			.map(i -> em.createNamedQuery("Person.all.instant", Person.class).setParameter("instant", i))
-			.orElse(em.createNamedQuery("Person.all", Person.class));
+			.orElse(em.createNamedQuery("Person.all.native", Person.class));
 		return query.getResultList();
 	}
 
