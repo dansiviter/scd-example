@@ -1,6 +1,6 @@
-# Slowly Changing Dimension (SDC) Example #
+# Slowly Changing Dimension (SCD) Example #
 
-This example shows using a very simplistic SDC Type 2 persistence using JPA. This demonstrates:
+This example shows using a very simplistic SCD Type 2 persistence using JPA. This demonstrates:
 * Latest Person by name,
 * Person by name at a point-in-time (instant),
 * Person audit trail,

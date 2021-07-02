@@ -8,7 +8,7 @@
 		<relativePath />
 	</parent>
 	<groupId>uk.dansiviter.scd</groupId>
-	<artifactId>sdc-example</artifactId>
+	<artifactId>scd-example</artifactId>
 	<version>1.0-SNAPSHOT</version>
 	<packaging>jar</packaging>
 	<name>${project.artifactId}</name>

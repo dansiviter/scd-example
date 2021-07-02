@@ -16,6 +16,6 @@ RUN addgroup -S helidon && adduser -S helidon -G helidon
 
 WORKDIR /helidon
 USER helidon
-COPY --from=build /helidon/target/sdc-example-jri ./
-ENTRYPOINT ["bin/java", "-XX:SharedArchiveFile=lib/start.jsa", "-Xshare:auto", "-jar", "app/sdc-example.jar"]
+COPY --from=build /helidon/target/scd-example-jri ./
+ENTRYPOINT ["bin/java", "-XX:SharedArchiveFile=lib/start.jsa", "-Xshare:auto", "-jar", "app/scd-example.jar"]
 EXPOSE 8080
