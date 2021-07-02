@@ -1,4 +1,4 @@
-[![GitHub Workflow Status](https://img.shields.io/github/workflow/status/dansiviter/scd-example/Build?style=flat-square)](https://github.com/dansiviter/scd-example/actions/workflows/build.yaml) ![Java 16](https://img.shields.io/badge/-Java%2016%2B-informational?style=flat-square)
+[![GitHub Workflow Status](https://img.shields.io/github/workflow/status/dansiviter/scd-example/Build?style=flat-square)](https://github.com/dansiviter/scd-example/actions/workflows/build.yaml) ![Java 16](https://img.shields.io/badge/-Java%2016-informational?style=flat-square)
 
 # Slowly Changing Dimension (SCD) Example #
 
