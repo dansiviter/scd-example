@@ -1,3 +1,5 @@
+[![GitHub Workflow Status](https://img.shields.io/github/workflow/status/dansiviter/scd-example/Build?style=flat-square)](https://github.com/dansiviter/scd-example/actions/workflows/build.yaml) ![Java 16](https://img.shields.io/badge/-Java%2011%2B-informational?style=flat-square)
+
 # Slowly Changing Dimension (SCD) Example #
 
 This example shows using a very simplistic SCD Type 2 persistence using JPA. This demonstrates:
