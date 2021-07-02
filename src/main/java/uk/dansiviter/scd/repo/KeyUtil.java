@@ -15,6 +15,9 @@ public class KeyUtil {
 	private EntityManagerFactory emf;
 
 	public long hash(Object entity) {
+		if (entity instanceof Iterable) {
+			return hash((Iterable<?>) entity);
+		}
 		return emf.getPersistenceUnitUtil().getIdentifier(entity).hashCode();
 	}
 

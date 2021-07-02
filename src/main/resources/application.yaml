@@ -6,6 +6,6 @@ javax:
       default:
         dataSourceClassName: org.h2.jdbcx.JdbcDataSource
         dataSource:
-          url: jdbc:h2:mem:app;INIT=RUNSCRIPT FROM 'classpath:create.ddl'
+          url: jdbc:h2:mem:app
           user: sa
           password: ""

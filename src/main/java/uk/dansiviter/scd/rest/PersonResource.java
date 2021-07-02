@@ -17,7 +17,7 @@ import javax.ws.rs.core.MediaType;
 import uk.dansiviter.scd.entity.Person;
 import uk.dansiviter.scd.repo.PersonRepo;
 
-@Path("/persons")
+@Path("v1alpha/people")
 @Produces(MediaType.APPLICATION_JSON)
 @Consumes(MediaType.APPLICATION_JSON)
 public class PersonResource {
@@ -25,6 +25,7 @@ public class PersonResource {
 	private PersonRepo repo;
 
 	@GET
+	@ETag
 	public List<Person> all(
 		@QueryParam("instant") Instant instant)  // eclipse-ee4j/jersey#4799
 	{

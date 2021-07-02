@@ -15,7 +15,10 @@
 		<!-- Entities -->
 		<class>uk.dansiviter.scd.entity.Person</class>
 		<properties>
-			<!-- <property name="javax.persistence.schema-generation.database.action" value="create" /> -->
+
+			<property name="javax.persistence.schema-generation.database.action" value="create" />
+			<property name="javax.persistence.schema-generation.create-source" value="metadata-then-script"/>
+			<property name="javax.persistence.schema-generation.create-script-source" value="META-INF/create.sql" />
 			<property name="eclipselink.deploy-on-startup" value="true"/>
 			<property name="eclipselink.jdbc.native-sql" value="true"/>
 			<property name="eclipselink.logging.logger" value="JavaLogger"/>

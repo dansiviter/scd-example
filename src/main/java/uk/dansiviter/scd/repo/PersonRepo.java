@@ -8,7 +8,6 @@ import javax.enterprise.context.ApplicationScoped;
 import javax.persistence.EntityManager;
 import javax.persistence.NoResultException;
 import javax.persistence.PersistenceContext;
-import javax.persistence.TypedQuery;
 import javax.transaction.Transactional;
 
 import uk.dansiviter.scd.entity.Person;
@@ -19,7 +18,7 @@ public class PersonRepo {
 	private EntityManager em;
 
 	public List<Person> all(Optional<Instant> instant) {
-		TypedQuery<Person> query = instant
+		var query = instant
 			.map(i -> em.createNamedQuery("Person.all.instant", Person.class).setParameter("instant", i))
 			.orElse(em.createNamedQuery("Person.all.native", Person.class));
 		return query.getResultList();
@@ -31,19 +30,17 @@ public class PersonRepo {
 
 	public Person get(String name, Optional<Instant> instant) {
 		try {
-			TypedQuery<Person> query = instant
+		var query = instant
 				.map(i -> em.createNamedQuery("Person.find.instant", Person.class).setParameter("instant", i))
 				.orElse(em.createNamedQuery("Person.find", Person.class));
-			return query.setParameter("name", name)
-				.setMaxResults(1)
-				.getSingleResult();
+			return query.setParameter("name", name).getSingleResult();
 		} catch (NoResultException e) {
 			return null;
 		}
 	}
 
 	public List<Person> getAudit(String name) {
-		return em.createNamedQuery("Person.find", Person.class)
+		return em.createNamedQuery("Person.audit", Person.class)
 			.setParameter("name", name)
 			.getResultList();
 	}

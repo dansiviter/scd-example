@@ -3,13 +3,18 @@ package uk.dansiviter.scd.entity;
 import java.io.Serializable;
 import java.time.Instant;
 import java.util.Objects;
+import java.util.UUID;
 
 import javax.persistence.Column;
+import javax.persistence.Convert;
 import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.IdClass;
+import javax.persistence.Index;
 import javax.persistence.NamedNativeQuery;
 import javax.persistence.NamedQuery;
+import javax.persistence.QueryHint;
+import javax.persistence.Table;
 
 @Entity
 @NamedQuery(
@@ -17,15 +22,23 @@ import javax.persistence.NamedQuery;
 	query = "SELECT p " +
 		"FROM Person p " +
 		"WHERE p.name = :name " +
-		"ORDER BY p.inserted DESC")
+		"ORDER BY p.inserted DESC",
+	hints = @QueryHint(name = "eclipselink.jdbc.max-rows", value = "1"))
 @NamedQuery(
 	name = "Person.find.instant",
 	query = "SELECT p " +
 		"FROM Person p " +
 		"WHERE p.name = :name " +
 		"AND p.inserted <= :instant " +
-		"ORDER BY p.inserted DESC")
+		"ORDER BY p.inserted DESC",
+	hints = @QueryHint(name = "eclipselink.jdbc.max-rows", value = "1"))
 @NamedQuery(
+	name = "Person.audit",
+	query = "SELECT p " +
+		"FROM Person p " +
+		"WHERE p.name = :name " +
+		"ORDER BY p.inserted DESC")
+	@NamedQuery(
 	name = "Person.all",
 	query = "SELECT p " +
 		"FROM Person p " +
@@ -38,8 +51,8 @@ import javax.persistence.NamedQuery;
 	name = "Person.all.native",
 	query = "SELECT * " +
 		"FROM PERSON p " +
-		"WHERE (p.name, p.inserted) IN (" +
-			"SELECT p0.name, MAX(p0.inserted) " +
+		"NATURAL JOIN (" +
+			"SELECT p0.name, MAX(p0.inserted) AS inserted " +
 			"FROM Person p0 " +
 			"GROUP BY p0.name" +
 	")",
@@ -58,7 +71,11 @@ import javax.persistence.NamedQuery;
 	name = "Person.allAudit",
 	query = "SELECT p FROM Person p")
 @IdClass(Person.PersonId.class)
+@Table(indexes = @Index(columnList = "uuid", unique = true))
 public class Person implements Serializable {
+	@Column(columnDefinition = "UUID default RANDOM_UUID() NOT NULL", unique = true, insertable = false, updatable = false)
+	@Convert(disableConversion = true)
+	private UUID uuid;
 	@Id
 	private String name;
 	@Id
@@ -73,6 +90,14 @@ public class Person implements Serializable {
 		this.name = name;
 		this.age = age;
 		this.inserted = inserted;
+	}
+
+	public UUID getUuid() {
+		return uuid;
+	}
+
+	public void setUuid(UUID uuid) {
+		this.uuid = uuid;
 	}
 
 	public String getName() {

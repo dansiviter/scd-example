@@ -3,8 +3,8 @@
 	<modelVersion>4.0.0</modelVersion>
 	<parent>
 		<groupId>io.helidon.applications</groupId>
-		<artifactId>helidon-se</artifactId>
-		<version>2.3.0</version>
+		<artifactId>helidon-mp</artifactId>
+		<version>2.3.1</version>
 		<relativePath />
 	</parent>
 	<groupId>uk.dansiviter.scd</groupId>
@@ -24,7 +24,27 @@
 		<version.lib.h2>1.4.200</version.lib.h2>
 	</properties>
 
+	<repositories>
+		<repository>
+			<id>snpsht</id>
+			<url>https://s01.oss.sonatype.org/content/repositories/snapshots/</url>
+			<releases><enabled>false</enabled></releases>
+			<snapshots><enabled>true</enabled></snapshots>
+		</repository>
+	</repositories>
+
 	<dependencies>
+		<dependency>
+			<groupId>uk.dansiviter.juli</groupId>
+			<artifactId>juli-cdi</artifactId>
+			<version>0.2.0-SNAPSHOT</version>
+		</dependency>
+		<dependency>
+			<groupId>uk.dansiviter.juli</groupId>
+			<artifactId>juli-processor</artifactId>
+			<version>0.2.0-SNAPSHOT</version>
+			<scope>provided</scope>
+		</dependency>
 		<dependency>
 			<groupId>io.helidon.logging</groupId>
 			<artifactId>helidon-logging-jul</artifactId>
@@ -107,6 +127,19 @@
 	<build>
 		<plugins>
 			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-dependency-plugin</artifactId>
+				<executions>
+					<execution>
+						<id>copy-libs</id>
+					</execution>
+				</executions>
+			</plugin>
+			<plugin>
+				<groupId>org.jboss.jandex</groupId>
+				<artifactId>jandex-maven-plugin</artifactId>
+			</plugin>
+			<plugin>
 				<groupId>com.ethlo.persistence.tools</groupId>
 				<artifactId>eclipselink-maven-plugin</artifactId>
 				<version>2.7.5.1</version>
@@ -136,4 +169,31 @@
 			</plugin>
 		</plugins>
 	</build>
+
+	<profiles>
+		<profile>
+			<id>jlink-image</id>
+			<build>
+				<plugins>
+					<plugin>
+						<groupId>io.helidon.build-tools</groupId>
+						<artifactId>helidon-maven-plugin</artifactId>
+						<executions>
+							<execution>
+								<id>jlink-image</id>
+								<goals>
+									<goal>jlink-image</goal>
+								</goals>
+								<configuration>
+									<additionalModules>
+										<additionalModule>jdk.crypto.ec</additionalModule>
+									</additionalModules>
+								</configuration>
+							</execution>
+						</executions>
+					</plugin>
+				</plugins>
+			</build>
+		</profile>
+	</profiles>
 </project>
