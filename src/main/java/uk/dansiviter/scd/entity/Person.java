@@ -50,7 +50,7 @@ import javax.persistence.Table;
 @NamedNativeQuery(
 	name = "Person.all.native",
 	query = "SELECT * " +
-		"FROM PERSON p " +
+		"FROM Person p " +
 		"NATURAL JOIN (" +
 			"SELECT p0.name, MAX(p0.inserted) AS inserted " +
 			"FROM Person p0 " +
@@ -73,13 +73,13 @@ import javax.persistence.Table;
 @IdClass(Person.PersonId.class)
 @Table(indexes = @Index(columnList = "uuid", unique = true))
 public class Person implements Serializable {
-	@Column(columnDefinition = "UUID default RANDOM_UUID() NOT NULL", unique = true, insertable = false, updatable = false)
+	@Column(columnDefinition = "UUID default gen_random_uuid() NOT NULL", unique = true, insertable = false, updatable = false)
 	@Convert(disableConversion = true)
 	private UUID uuid;
 	@Id
 	private String name;
 	@Id
-	@Column(columnDefinition = "TIMESTAMP(9) WITH TIME ZONE")
+	@Column(columnDefinition = "TIMESTAMP(6) WITH TIME ZONE")
 	private Instant inserted;
 
 	private int age;

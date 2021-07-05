@@ -4,8 +4,7 @@ javax:
   sql:
     DataSource:
       default:
-        dataSourceClassName: org.h2.jdbcx.JdbcDataSource
+        jdbcUrl: jdbc:tc:postgresql:13.3:///test
         dataSource:
-          url: jdbc:h2:mem:app
-          user: sa
-          password: ""
+          user: test
+          password: test

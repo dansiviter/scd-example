@@ -23,62 +23,16 @@ Notes:
 docker run `
   -e POSTGRES_PASSWORD=pwd `
   -p 5432:5432 `
-	-it `
+	-d `
 	--rm `
 	postgres:alpine
-```
-
-
-```
-docker run `
-  -e SQLPAD_CONNECTIONS__pgdemo__name=Postgres `
-  -e SQLPAD_CONNECTIONS__pgdemo__driver=postgres `
-  -e SQLPAD_CONNECTIONS__pgdemo__host=host.docker.internal `
-  -e SQLPAD_CONNECTIONS__pgdemo__database=postgres `
-  -e SQLPAD_CONNECTIONS__pgdemo__username=postgres `
-  -e SQLPAD_CONNECTIONS__pgdemo__password=pwd `
-	-e SQLPAD_AUTH_DISABLED=true `
-	-e SQLPAD_AUTH_DISABLED_DEFAULT_ROLE=editor `
-	-p 3000:3000 `
-	-it `
-	--rm `
-	sqlpad/sqlpad
 ```
 
 ```
 docker run -p 8082:80 `
 	-e 'PGADMIN_DEFAULT_EMAIL=user@domain.com' `
 	-e 'PGADMIN_DEFAULT_PASSWORD=SuperSecret' `
-	-it `
+	-d `
 	--rm `
 	-d dpage/pgadmin4
 ```
-
-
-CREATE TABLE IF NOT EXISTS test.metric
-(
-    id uuid NOT NULL,
-    inserted timestamp with time zone NOT NULL,
-    name character varying(32) COLLATE pg_catalog."default",
-    CONSTRAINT metric_pkey PRIMARY KEY (id, inserted)
-)
-
-CREATE TABLE IF NOT EXISTS test.point
-(
-    metric_id uuid,
-    "time" timestamp with time zone,
-    inserted timestamp with time zone,
-    value bigint,
-    PRIMARY KEY (metric_id, "time", inserted)
-) PARTITION BY RANGE ("time");
-
-
-INSERT INTO test.point (metric_id, "time", inserted, value)
-    SELECT (
-      SELECT id FROM test.metric WHERE name = "carrots"
-    ), ts, now(), 10
-    FROM generate_series(
-      '2021-06-07'::timestamp,
-      '2021-06-08'::timestamp,
-      '1 second'::interval ts
-    )

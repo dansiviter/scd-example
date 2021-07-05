@@ -1,5 +1,7 @@
 package uk.dansiviter.scd.rest;
 
+import static javax.ws.rs.core.MediaType.APPLICATION_JSON;
+
 import java.time.Instant;
 import java.util.List;
 import java.util.Optional;
@@ -12,14 +14,13 @@ import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
-import javax.ws.rs.core.MediaType;
 
 import uk.dansiviter.scd.entity.Person;
 import uk.dansiviter.scd.repo.PersonRepo;
 
 @Path("v1alpha/people")
-@Produces(MediaType.APPLICATION_JSON)
-@Consumes(MediaType.APPLICATION_JSON)
+@Produces(APPLICATION_JSON)
+@Consumes(APPLICATION_JSON)
 public class PersonResource {
 	@Inject
 	private PersonRepo repo;
