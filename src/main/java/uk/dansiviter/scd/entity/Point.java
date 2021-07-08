@@ -1,8 +1,8 @@
 package uk.dansiviter.scd.entity;
 
 import java.io.Serializable;
-import java.sql.Timestamp;
 import java.time.Instant;
+import java.time.OffsetDateTime;
 import java.util.Objects;
 
 import javax.persistence.Column;
@@ -13,6 +13,8 @@ import javax.persistence.Id;
 import javax.persistence.IdClass;
 import javax.persistence.NamedNativeQuery;
 import javax.persistence.SqlResultSetMapping;
+
+import org.eclipse.persistence.annotations.ReturnInsert;
 
 @Entity
 @NamedNativeQuery(
@@ -28,34 +30,42 @@ import javax.persistence.SqlResultSetMapping;
 	resultClass = Point.class)
 @NamedNativeQuery(
 	name = "Point.window",
-	query = "SELECT ts::TIMESTAMP AT TIME ZONE 'UTC' AS start, ts::TIMESTAMP AT TIME ZONE 'UTC' + 'PT23H59M59.999999S' AS end, SUM(p.value) AS value " +
+	query = "SELECT " +
+			"ts AS start, " +
+			"ts + ?4::INTERVAL AS end, " +
+			"SUM(p.value) AS value " +
 		"FROM Point p " +
 		"NATURAL JOIN (" +
 			"SELECT name, time, MAX(inserted) AS inserted FROM point " +
 			"WHERE name = ?3 " +
+			"AND time >= ?1 " +
+			"AND time <= ?2 " +
 			"GROUP BY name, time" +
 		") AS p0 " +
-		"RIGHT JOIN generate_series(?1::DATE, ?2::DATE, '1 day'::INTERVAL) ts ON ts = p.time::DATE " +
+		"RIGHT JOIN generate_series(?1, ?2, ?4::INTERVAL) ts " +
+		  "ON ts <= p.time AND ts + ?4::INTERVAL > p.time " +
 		"GROUP BY ts " +
 		"ORDER BY ts",
 	resultSetMapping = "window")
 @SqlResultSetMapping(name = "window", classes = @ConstructorResult(
 	targetClass = Window.class,
 	columns = {
-		@ColumnResult(name = "start", type = Timestamp.class),
-		@ColumnResult(name = "end", type = Timestamp.class),
+		@ColumnResult(name = "start", type = OffsetDateTime.class),
+		@ColumnResult(name = "end", type = OffsetDateTime.class),
 		@ColumnResult(name = "value", type = Long.class)
 	})
 )
 @IdClass(Point.PointId.class)
 public class Point implements Serializable {
 	@Id
+	@Column(nullable = false)
 	private String name;
 	@Id
-	@Column(columnDefinition = "TIMESTAMPTZ(6)", nullable = false)
+	@Column(columnDefinition = "TIMESTAMPTZ", nullable = false)
 	private Instant time;
 	@Id
-	@Column(columnDefinition = "TIMESTAMPTZ(6)", nullable = false)
+	@Column(columnDefinition = "TIMESTAMPTZ DEFAULT (now() at time zone 'utc')", nullable = false, insertable = false)
+	@ReturnInsert
 	private Instant inserted;
 
 	@Column(nullable = false)

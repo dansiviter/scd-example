@@ -10,7 +10,7 @@
 
 		<!-- Converters -->
 		<class>uk.dansiviter.scd.repo.InstantConverter</class>
-		<class>uk.dansiviter.scd.repo.OffsetDateTimeConverter</class>
+		<class>uk.dansiviter.scd.repo.UuidConverter</class>
 
 		<!-- Entities -->
 		<class>uk.dansiviter.scd.entity.Person</class>

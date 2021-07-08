@@ -1,18 +1,19 @@
 package uk.dansiviter.scd.entity;
 
-import java.sql.Timestamp;
 import java.time.Instant;
+import java.time.OffsetDateTime;
 
-import uk.dansiviter.scd.repo.InstantConverter;
+import javax.json.bind.annotation.JsonbPropertyOrder;
 
+@JsonbPropertyOrder({ "start", "end", "value" })
 public class Window {
 	private final Instant start;
 	private final Instant end;
 	private final Long value;
 
-	public Window(Timestamp start, Timestamp end, Long value) {
-		this.start = InstantConverter.from(start);
-		this.end = InstantConverter.from(end);
+	public Window(OffsetDateTime start, OffsetDateTime end, Long value) {
+		this.start = start.toInstant();
+		this.end = end.toInstant();
 		this.value = value;
 	}
 

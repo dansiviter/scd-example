@@ -46,6 +46,11 @@
 			<scope>provided</scope>
 		</dependency>
 		<dependency>
+			<groupId>org.threeten</groupId>
+			<artifactId>threeten-extra</artifactId>
+			<version>1.6.0</version>
+		</dependency>
+		<dependency>
 			<groupId>io.helidon.logging</groupId>
 			<artifactId>helidon-logging-jul</artifactId>
 		</dependency>
@@ -57,7 +62,6 @@
 		<dependency>
 			<groupId>org.glassfish.jersey.media</groupId>
 			<artifactId>jersey-media-json-binding</artifactId>
-			<scope>runtime</scope>
 		</dependency>
 
 		<dependency>
@@ -98,7 +102,6 @@
 		<dependency>
 			<groupId>io.helidon.integrations.cdi</groupId>
 			<artifactId>helidon-integrations-cdi-eclipselink</artifactId>
-			<scope>runtime</scope>
 		</dependency>
 
 		<dependency>

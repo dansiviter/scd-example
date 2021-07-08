@@ -3,13 +3,19 @@
 # Slowly Changing Dimension (SCD) Example #
 
 This example shows using a very simplistic SCD Type 2 persistence using JPA. This demonstrates:
-* Latest Person by name,
-* Person by name at a point-in-time (instant),
-* Person audit trail,
-* All latest Persons,
-* All Person audit trail (rarely used, but useful example non-the-less).
+* Typical 'Person' entity:
+  * By name,
+  * By name at a point-in-time (instant),
+  * Audit trail,
+  * All latest vales,
+  * All audit trail (rarely used, but useful example non-the-less),
+* Time-series:
+  * Raw,
+  * Tumbling windows with variable alignment period and start and end dates using either date or date and time.
 
-For simplicity sake, this doesn't use start/end dates, it just uses a inserted value as part of the key.
+> :information_source: For simplicity sake, this doesn't use start/end dates, it just uses a inserted value as part of the key.
+
+> :information_source: Returned time-series data windows are `[start, end)` meaning start is inclusive and end is exclusive as this tends to look cleaner.
 
 Notes:
 * It seems EclipseLink refuses to compile with Java 16. It's due to a really old version of ASM and that's not going to be updated until 3.0.1 (aka Jakarta). Workaround is to use bump to just `org.eclipse.persistence:org.eclipse.persistence.asm:3.0.1`.
@@ -18,20 +24,10 @@ Notes:
 * If you want to view your data, go to [`localhost:8082`](http://localhost:8082) and use JDBC URL `jdbc:h2:mem:app`,
 * Some of the queries use correlated subqueries, which _can_ be a concern but this can be mitigated with indexes on the correlation criteria and some DBs can rewrite them.
 
-
-```
-docker run `
-  -e POSTGRES_PASSWORD=pwd `
-  -p 5432:5432 `
-	-d `
-	--rm `
-	postgres:alpine
-```
-
 ```
 docker run -p 8082:80 `
-	-e 'PGADMIN_DEFAULT_EMAIL=user@domain.com' `
-	-e 'PGADMIN_DEFAULT_PASSWORD=SuperSecret' `
+	-e 'PGADMIN_DEFAULT_EMAIL=user' `
+	-e 'PGADMIN_DEFAULT_PASSWORD=pwd' `
 	-d `
 	--rm `
 	-d dpage/pgadmin4

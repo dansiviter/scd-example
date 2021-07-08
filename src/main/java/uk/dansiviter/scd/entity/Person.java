@@ -6,7 +6,6 @@ import java.util.Objects;
 import java.util.UUID;
 
 import javax.persistence.Column;
-import javax.persistence.Convert;
 import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.IdClass;
@@ -15,6 +14,8 @@ import javax.persistence.NamedNativeQuery;
 import javax.persistence.NamedQuery;
 import javax.persistence.QueryHint;
 import javax.persistence.Table;
+
+import org.eclipse.persistence.annotations.ReturnInsert;
 
 @Entity
 @NamedQuery(
@@ -55,7 +56,7 @@ import javax.persistence.Table;
 			"SELECT p0.name, MAX(p0.inserted) AS inserted " +
 			"FROM Person p0 " +
 			"GROUP BY p0.name" +
-	")",
+	") p0",
 	resultClass = Person.class)
 @NamedQuery(
 	name = "Person.all.instant",
@@ -73,13 +74,15 @@ import javax.persistence.Table;
 @IdClass(Person.PersonId.class)
 @Table(indexes = @Index(columnList = "uuid", unique = true))
 public class Person implements Serializable {
-	@Column(columnDefinition = "UUID default gen_random_uuid() NOT NULL", unique = true, insertable = false, updatable = false)
-	@Convert(disableConversion = true)
+	@Column(columnDefinition = "UUID DEFAULT gen_random_uuid() NOT NULL", unique = true, insertable = false, updatable = false)
+	@ReturnInsert
 	private UUID uuid;
 	@Id
+	@Column(nullable = false)
 	private String name;
 	@Id
-	@Column(columnDefinition = "TIMESTAMP(6) WITH TIME ZONE")
+	@Column(columnDefinition = "TIMESTAMPTZ DEFAULT (now() at time zone 'utc')", nullable = false, insertable = false)
+	@ReturnInsert
 	private Instant inserted;
 
 	private int age;

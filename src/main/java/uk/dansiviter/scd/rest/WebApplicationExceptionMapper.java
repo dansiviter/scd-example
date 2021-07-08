@@ -1,5 +1,7 @@
 package uk.dansiviter.scd.rest;
 
+import static java.lang.String.format;
+
 import javax.inject.Inject;
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.Response;
@@ -26,6 +28,6 @@ public class WebApplicationExceptionMapper implements ExceptionMapper<WebApplica
 	}
 
 	private static String message(WebApplicationException e) {
-		return String.format("HTTP %s: %s", e.getResponse().getStatusInfo(), e.getMessage());
+		return format("HTTP %s: %s", e.getResponse().getStatusInfo(), e.getMessage());
 	}
 }

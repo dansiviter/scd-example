@@ -2,14 +2,19 @@ package uk.dansiviter.scd.rest;
 
 import static javax.ws.rs.core.MediaType.APPLICATION_JSON;
 
+import java.time.temporal.Temporal;
 import java.util.List;
 import java.util.Optional;
 
 import javax.inject.Inject;
+import javax.ws.rs.DefaultValue;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
+import javax.ws.rs.QueryParam;
+
+import org.threeten.extra.PeriodDuration;
 
 import uk.dansiviter.scd.entity.Point;
 import uk.dansiviter.scd.entity.Window;
@@ -31,7 +36,11 @@ public class PointResource {
 	@GET
 	@Path("{name}/windows")
 	public List<Window> windows(
-			@PathParam("name") String name) {
-		return repo.window(name, Optional.empty(), Optional.empty());
+			@PathParam("name") String name,
+			@QueryParam("start") Temporal start,
+			@QueryParam("end") Temporal end,
+			@QueryParam("alignment") @DefaultValue("P1D") PeriodDuration alignment)
+	{
+		return repo.window(name, Optional.ofNullable(start), Optional.ofNullable(end), alignment);
 	}
 }

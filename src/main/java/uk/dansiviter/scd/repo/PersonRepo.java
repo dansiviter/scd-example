@@ -30,7 +30,7 @@ public class PersonRepo {
 
 	public Person get(String name, Optional<Instant> instant) {
 		try {
-		var query = instant
+			var query = instant
 				.map(i -> em.createNamedQuery("Person.find.instant", Person.class).setParameter("instant", i))
 				.orElse(em.createNamedQuery("Person.find", Person.class));
 			return query.setParameter("name", name).getSingleResult();
@@ -51,8 +51,8 @@ public class PersonRepo {
 		if (person.equals(prev)) {
 			return prev;
 		}
-		person.setInserted(Instant.now());
 		em.persist(person);
+		em.flush();
 		return person;
 	}
 }
