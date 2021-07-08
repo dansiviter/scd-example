@@ -16,6 +16,9 @@ public class UuidConverter implements AttributeConverter<UUID, Object> {
 
 	@Override
 	public UUID convertToEntityAttribute(Object dbData) {
+		if (dbData == null) {
+			return null;
+		}
 		if (dbData instanceof UUID) {
 			return (UUID) dbData;
 		}
