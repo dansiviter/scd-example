@@ -2,8 +2,6 @@ package uk.dansiviter.scd.repo;
 
 import static java.time.ZoneOffset.UTC;
 import static java.time.temporal.TemporalAdjusters.firstDayOfMonth;
-import static java.time.temporal.TemporalAdjusters.firstDayOfNextMonth;
-import static java.time.temporal.TemporalAdjusters.firstDayOfNextYear;
 import static java.time.temporal.TemporalAdjusters.firstDayOfYear;
 
 import java.time.Instant;
@@ -44,10 +42,10 @@ public class PointRepo {
 		var endInstant = end(name, startInstant, end, alignment);
 		this.log.window(name, startInstant, endInstant, alignment);
 		return em.createNamedQuery("Point.window", Window.class)
-			.setParameter(1, startInstant)
-			.setParameter(2, endInstant)
-			.setParameter(3, name)
-			.setParameter(4, alignment.toString())
+			.setParameter("start", startInstant)
+			.setParameter("end", endInstant)
+			.setParameter("name", name)
+			.setParameter("alignment", alignment.toString())
 			.getResultList();
 	}
 
@@ -56,12 +54,12 @@ public class PointRepo {
 			return start.map(PointRepo::toDateTime).orElseThrow();
 		}
 
-		var result = em.createQuery("SELECT MIN(p.time) FROM Point p WHERE p.name = ?1", Instant.class)
-			.setParameter(1, name)
+		var result = em.createNamedQuery("Point.minTime", Instant.class)
+			.setParameter("name", name)
 			.getSingleResult()
 			.atOffset(UTC);
 
-		result = round(result, lastWholeUnit(alignment), true);
+		result = truncateTo(result, lastWholeUnit(alignment));
 		return result;
 	}
 
@@ -70,8 +68,8 @@ public class PointRepo {
 			return end.map(PointRepo::toDateTime).orElseThrow();
 		}
 
-		var result = em.createQuery("SELECT MAX(p.time) FROM Point p WHERE p.name = ?1", Instant.class)
-			.setParameter(1, name)
+		var result = em.createNamedQuery("Point.maxTime", Instant.class)
+			.setParameter("name", name)
 			.getSingleResult()
 			.atOffset(UTC);
 
@@ -89,18 +87,18 @@ public class PointRepo {
 		throw new IllegalArgumentException("Not expected! [" + t + "]");
 	}
 
-	private static OffsetDateTime round(OffsetDateTime in, ChronoUnit unit, boolean down) {
+	private static OffsetDateTime truncateTo(OffsetDateTime in, ChronoUnit unit) {
 		if (unit == ChronoUnit.NANOS) {
 			return in;
 		}
 		// Instants don't like truncation, so have to use a offset date time
 		var out = in;
 		if (unit == ChronoUnit.MONTHS) {
-			out = out.truncatedTo(ChronoUnit.DAYS).with(down ? firstDayOfMonth() : firstDayOfNextMonth());
+			out = out.truncatedTo(ChronoUnit.DAYS).with(firstDayOfMonth());
 		} else if (unit == ChronoUnit.YEARS) {
-			out = out.truncatedTo(ChronoUnit.DAYS).with(down ? firstDayOfYear() : firstDayOfNextYear());
+			out = out.truncatedTo(ChronoUnit.DAYS).with(firstDayOfYear());
 		} else {
-			out = out.plus(down ? 0 : 1, unit);
+			out = out.plus(0, unit);
 		}
 		return out;
 	}

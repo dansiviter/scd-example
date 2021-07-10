@@ -9,13 +9,8 @@ import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.IdClass;
-import javax.persistence.Index;
 import javax.persistence.NamedNativeQuery;
 import javax.persistence.NamedQuery;
-import javax.persistence.QueryHint;
-import javax.persistence.Table;
-
-import org.eclipse.persistence.annotations.ReturnInsert;
 
 @Entity
 @NamedQuery(
@@ -23,16 +18,14 @@ import org.eclipse.persistence.annotations.ReturnInsert;
 	query = "SELECT p " +
 		"FROM Person p " +
 		"WHERE p.name = :name " +
-		"ORDER BY p.inserted DESC",
-	hints = @QueryHint(name = "eclipselink.jdbc.max-rows", value = "1"))
+		"ORDER BY p.inserted DESC")
 @NamedQuery(
 	name = "Person.find.instant",
 	query = "SELECT p " +
 		"FROM Person p " +
 		"WHERE p.name = :name " +
 		"AND p.inserted <= :instant " +
-		"ORDER BY p.inserted DESC",
-	hints = @QueryHint(name = "eclipselink.jdbc.max-rows", value = "1"))
+		"ORDER BY p.inserted DESC")
 @NamedQuery(
 	name = "Person.audit",
 	query = "SELECT p " +
@@ -72,17 +65,14 @@ import org.eclipse.persistence.annotations.ReturnInsert;
 	name = "Person.allAudit",
 	query = "SELECT p FROM Person p")
 @IdClass(Person.PersonId.class)
-@Table(indexes = @Index(columnList = "uuid", unique = true))
 public class Person implements Serializable {
-	@Column(columnDefinition = "UUID DEFAULT gen_random_uuid() NOT NULL", unique = true, insertable = false, updatable = false)
-	@ReturnInsert
+	@Column(columnDefinition = "UUID DEFAULT gen_random_uuid() NOT NULL", insertable = false, unique = true, updatable = false)
 	private UUID uuid;
 	@Id
 	@Column(nullable = false)
 	private String name;
 	@Id
-	@Column(columnDefinition = "TIMESTAMPTZ DEFAULT (now() at time zone 'utc')", nullable = false, insertable = false)
-	@ReturnInsert
+	@Column(columnDefinition = "TIMESTAMPTZ DEFAULT (now() at time zone 'utc')")
 	private Instant inserted;
 
 	private int age;

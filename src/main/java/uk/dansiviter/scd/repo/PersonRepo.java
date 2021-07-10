@@ -1,8 +1,11 @@
 package uk.dansiviter.scd.repo;
 
+import static uk.dansiviter.scd.repo.DbUtil.nowInstant;
+
 import java.time.Instant;
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 
 import javax.enterprise.context.ApplicationScoped;
 import javax.persistence.EntityManager;
@@ -33,7 +36,7 @@ public class PersonRepo {
 			var query = instant
 				.map(i -> em.createNamedQuery("Person.find.instant", Person.class).setParameter("instant", i))
 				.orElse(em.createNamedQuery("Person.find", Person.class));
-			return query.setParameter("name", name).getSingleResult();
+			return query.setMaxResults(1).setParameter("name", name).getSingleResult();
 		} catch (NoResultException e) {
 			return null;
 		}
@@ -51,6 +54,8 @@ public class PersonRepo {
 		if (person.equals(prev)) {
 			return prev;
 		}
+		person.setUuid(UUID.randomUUID());
+		person.setInserted(nowInstant());
 		em.persist(person);
 		em.flush();
 		return person;
