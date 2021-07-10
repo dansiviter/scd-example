@@ -12,9 +12,8 @@ import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.IdClass;
 import javax.persistence.NamedNativeQuery;
+import javax.persistence.NamedQuery;
 import javax.persistence.SqlResultSetMapping;
-
-import org.eclipse.persistence.annotations.ReturnInsert;
 
 @Entity
 @NamedNativeQuery(
@@ -32,21 +31,23 @@ import org.eclipse.persistence.annotations.ReturnInsert;
 	name = "Point.window",
 	query = "SELECT " +
 			"ts AS start, " +
-			"ts + ?4::INTERVAL AS end, " +
+			"ts + CAST(:alignment AS INTERVAL) AS end, " +
 			"SUM(p.value) AS value " +
 		"FROM Point p " +
 		"NATURAL JOIN (" +
 			"SELECT name, time, MAX(inserted) AS inserted FROM point " +
-			"WHERE name = ?3 " +
-			"AND time >= ?1 " +
-			"AND time <= ?2 " +
+			"WHERE name = :name " +
+			"AND time >= :start " +
+			"AND time <= :end " +
 			"GROUP BY name, time" +
 		") AS p0 " +
-		"RIGHT JOIN generate_series(?1, ?2, ?4::INTERVAL) ts " +
-		  "ON ts <= p.time AND ts + ?4::INTERVAL > p.time " +
+		"RIGHT JOIN generate_series(:start, :end, CAST(:alignment AS INTERVAL)) ts " +
+		  "ON ts <= p.time AND ts + CAST(:alignment AS INTERVAL) > p.time " +
 		"GROUP BY ts " +
 		"ORDER BY ts",
 	resultSetMapping = "window")
+@NamedQuery(name = "Point.minTime", query = "SELECT MIN(p.time) FROM Point p WHERE p.name = :name")
+@NamedQuery(name = "Point.maxTime", query = "SELECT MAX(p.time) FROM Point p WHERE p.name = :name")
 @SqlResultSetMapping(name = "window", classes = @ConstructorResult(
 	targetClass = Window.class,
 	columns = {
@@ -65,7 +66,6 @@ public class Point implements Serializable {
 	private Instant time;
 	@Id
 	@Column(columnDefinition = "TIMESTAMPTZ DEFAULT (now() at time zone 'utc')", nullable = false, insertable = false)
-	@ReturnInsert
 	private Instant inserted;
 
 	@Column(nullable = false)
