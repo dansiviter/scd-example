@@ -4,7 +4,7 @@ javax:
   sql:
     DataSource:
       default:
-        jdbcUrl: jdbc:tc:postgresql:13.3:///test
+        jdbcUrl: jdbc:tc:postgresql:13.4:///test
         dataSource:
           user: test
           password: test

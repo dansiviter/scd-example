@@ -4,8 +4,7 @@
 	<parent>
 		<groupId>io.helidon.applications</groupId>
 		<artifactId>helidon-mp</artifactId>
-		<version>2.3.2</version>
-		<relativePath />
+		<version>2.3.3</version>
 	</parent>
 	<groupId>uk.dansiviter.scd</groupId>
 	<artifactId>scd-example</artifactId>
@@ -21,6 +20,8 @@
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
 
+		<version.lib.jandex>2.4.0.Final</version.lib.jandex>
+		<version.plugin.jandex>1.2.0</version.plugin.jandex>
 		<version.lib.h2>1.4.200</version.lib.h2>
 	</properties>
 
@@ -43,7 +44,7 @@
 		<dependency>
 			<groupId>org.threeten</groupId>
 			<artifactId>threeten-extra</artifactId>
-			<version>1.6.0</version>
+			<version>1.7.0</version>
 		</dependency>
 		<dependency>
 			<groupId>io.helidon.logging</groupId>
@@ -62,13 +63,13 @@
 		<dependency>
 			<groupId>org.postgresql</groupId>
 			<artifactId>postgresql</artifactId>
-			<version>42.2.22</version>
+			<version>42.2.23</version>
 		</dependency>
 
 		<dependency>
 			<groupId>org.testcontainers</groupId>
 			<artifactId>postgresql</artifactId>
-			<version>1.15.3</version>
+			<version>1.16.0</version>
 		</dependency>
 
 		<dependency>  <!-- Required for Java 16 -->
