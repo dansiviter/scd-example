@@ -27,10 +27,8 @@ public class PersonResource {
 
 	@GET
 	@ETag
-	public List<Person> all(
-		@QueryParam("instant") Instant instant)  // eclipse-ee4j/jersey#4799
-	{
-		return repo.all(Optional.ofNullable(instant));
+	public List<Person> all(@QueryParam("instant") Optional<Instant> instant) {
+		return repo.all(instant);
 	}
 
 	@GET
@@ -44,9 +42,9 @@ public class PersonResource {
 	@ETag
 	public Person get(
 		@PathParam("name") String name,
-		@QueryParam("instant") Instant instant)  // eclipse-ee4j/jersey#4799
+		@QueryParam("instant") Optional<Instant> instant)
 	{
-		return repo.get(name, Optional.ofNullable(instant));
+		return repo.get(name, instant);
 	}
 
 	@GET

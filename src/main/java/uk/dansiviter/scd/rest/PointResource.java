@@ -28,8 +28,7 @@ public class PointResource {
 
 	@GET
 	@Path("{name}")
-	public List<Point> points(
-			@PathParam("name") String name) {
+	public List<Point> points(@PathParam("name") String name) {
 		return repo.points(name);
 	}
 
@@ -37,10 +36,10 @@ public class PointResource {
 	@Path("{name}/windows")
 	public List<Window> windows(
 			@PathParam("name") String name,
-			@QueryParam("start") Temporal start,
-			@QueryParam("end") Temporal end,
+			@QueryParam("start") Optional<Temporal> start,
+			@QueryParam("end") Optional<Temporal> end,
 			@QueryParam("alignment") @DefaultValue("P1D") PeriodDuration alignment)
 	{
-		return repo.window(name, Optional.ofNullable(start), Optional.ofNullable(end), alignment);
+		return repo.window(name, start, end, alignment);
 	}
 }

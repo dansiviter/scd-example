@@ -1,4 +1,4 @@
-FROM adoptopenjdk/openjdk16:alpine as build
+FROM eclipse-temurin:17-alpine as build
 RUN apk add --no-cache bash maven
 
 WORKDIR /helidon

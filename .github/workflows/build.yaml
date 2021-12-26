@@ -14,15 +14,16 @@ jobs:
       uses: actions/setup-java@v2
       with:
         distribution: 'adopt'
-        java-version: 16
-    - name: Cache Maven packages
-      uses: actions/cache@v2
+        java-version: 17
+        cache: 'maven'
+    - name: Initialize CodeQL
+      uses: github/codeql-action/init@v1
       with:
-        path: ~/.m2
-        key: ${{ runner.os }}-m2-${{ hashFiles('**/pom.xml') }}
-        restore-keys: ${{ runner.os }}-m2
+        languages: java
     - name: Build
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       run: >
         mvn -B -ntp verify
+    - name: Perform CodeQL Analysis
+      uses: github/codeql-action/analyze@v1
