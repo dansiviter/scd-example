@@ -22,7 +22,7 @@ public record Person(
 	@NotNull @Size(min = 3, max = 32) String name,
 	Instant inserted,
 	@Min(0) int age)
-implements PersonBuilder.With, Cachable {
+implements PersonBuilder.With {
 
 	public static Person from(PersonEntity entity) {
 		requireNonNull(entity);
@@ -35,7 +35,7 @@ implements PersonBuilder.With, Cachable {
 	}
 
 	@Override
-	public long hash() {
+	public int hashCode() {
 		return Objects.hash(name, inserted);
 	}
 

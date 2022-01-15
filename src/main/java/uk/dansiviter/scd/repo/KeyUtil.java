@@ -8,12 +8,8 @@ import java.util.OptionalLong;
 
 import javax.enterprise.context.ApplicationScoped;
 
-import uk.dansiviter.scd.rest.api.Cachable;
-
 @ApplicationScoped
 public class KeyUtil {
-	// @PersistenceUnit
-	// private EntityManagerFactory emf;
 
 	public OptionalLong hash(Object entity) {
 		if (entity instanceof Iterable) {
@@ -22,14 +18,10 @@ public class KeyUtil {
 		if (entity instanceof Optional) {
 			entity = ((Optional<?>) entity).orElse(null);
 		}
-		if (entity instanceof Cachable) {
-			return OptionalLong.of(((Cachable) entity).hash());
-		}
 		if (entity == null) {
 			return OptionalLong.empty();
 		}
-		throw new UnsupportedOperationException("Unsupported type! [" + entity + "]");
-		// return emf.getPersistenceUnitUtil().getIdentifier(entity).hashCode();
+		return OptionalLong.of(entity.hashCode());
 	}
 
 	private long hash(Iterable<?> entities) {

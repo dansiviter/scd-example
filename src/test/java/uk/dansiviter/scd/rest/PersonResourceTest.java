@@ -111,6 +111,6 @@ class PersonResourceTest {
 	}
 
 	private static EntityTag eTag(Person person) {
-		return new EntityTag(Long.toHexString(person.hash()));
+		return new EntityTag(Long.toHexString(person.hashCode()));
 	}
 }
