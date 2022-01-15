@@ -3,9 +3,9 @@ package uk.dansiviter.scd.entity;
 import java.time.Instant;
 import java.time.OffsetDateTime;
 
-import javax.json.bind.annotation.JsonbPropertyOrder;
+import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 
-@JsonbPropertyOrder({ "start", "end", "value" })
+@JsonPropertyOrder({ "start", "end", "value" })
 public class Window {
 	private final Instant start;
 	private final Instant end;

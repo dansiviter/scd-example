@@ -5,6 +5,7 @@ import static javax.ws.rs.core.MediaType.APPLICATION_JSON;
 import java.time.temporal.Temporal;
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 
 import javax.inject.Inject;
 import javax.ws.rs.DefaultValue;
@@ -16,30 +17,36 @@ import javax.ws.rs.QueryParam;
 
 import org.threeten.extra.PeriodDuration;
 
-import uk.dansiviter.scd.entity.Point;
 import uk.dansiviter.scd.entity.Window;
-import uk.dansiviter.scd.repo.PointRepo;
+import uk.dansiviter.scd.repo.TimeSeriesRepo;
+import uk.dansiviter.scd.rest.api.Point;
+import uk.dansiviter.scd.rest.api.TimeSeries;
 
-@Path("v1alpha/points")
+@Path("v1alpha/timeseries")
 @Produces(APPLICATION_JSON)
-public class PointResource {
+public class TimeSeriesResource {
 	@Inject
-	private PointRepo repo;
+	private TimeSeriesRepo repo;
 
 	@GET
-	@Path("{name}")
-	public List<Point> points(@PathParam("name") String name) {
-		return repo.points(name);
+	public List<TimeSeries> timeSeries() {
+		return TimeSeries.from(repo.timeSeries());
 	}
 
 	@GET
-	@Path("{name}/windows")
+	@Path("{timeSeriesId}")
+	public List<Point> points(@PathParam("timeSeriesId") UUID timeSeriesId) {
+		return Point.from(repo.points(timeSeriesId));
+	}
+
+	@GET
+	@Path("{timeSeriesId}/windows")
 	public List<Window> windows(
-			@PathParam("name") String name,
+			@PathParam("timeSeriesId") UUID timeSeriesId,
 			@QueryParam("start") Optional<Temporal> start,
 			@QueryParam("end") Optional<Temporal> end,
 			@QueryParam("alignment") @DefaultValue("P1D") PeriodDuration alignment)
 	{
-		return repo.window(name, start, end, alignment);
+		return repo.window(timeSeriesId, start, end, alignment);
 	}
 }

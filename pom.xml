@@ -24,6 +24,15 @@
 		<version.plugin.jandex>1.2.1</version.plugin.jandex>
 	</properties>
 
+	<repositories>
+		<repository>
+			<id>snpsht</id>
+			<url>https://s01.oss.sonatype.org/content/repositories/snapshots/</url>
+			<releases><enabled>false</enabled></releases>
+			<snapshots><enabled>true</enabled></snapshots>
+		</repository>
+	</repositories>
+
 	<dependencies>
 		<dependency>
 			<groupId>uk.dansiviter.juli</groupId>
@@ -46,6 +55,17 @@
 			<version>1.7.0</version>
 		</dependency>
 		<dependency>
+			<groupId>uk.dansiviter.uuid</groupId>
+			<artifactId>uuid</artifactId>
+			<version>0.1.0-SNAPSHOT</version>
+		</dependency>
+		<dependency>
+			<groupId>io.soabase.record-builder</groupId>
+			<artifactId>record-builder-processor</artifactId>
+			<version>29</version>
+			<scope>provided</scope>
+		</dependency>
+		<dependency>
 			<groupId>io.helidon.logging</groupId>
 			<artifactId>helidon-logging-jul</artifactId>
 		</dependency>
@@ -56,7 +76,12 @@
 
 		<dependency>
 			<groupId>org.glassfish.jersey.media</groupId>
-			<artifactId>jersey-media-json-binding</artifactId>
+			<artifactId>jersey-media-json-jackson</artifactId>
+		</dependency>
+
+		<dependency>
+			<groupId>com.fasterxml.jackson.datatype</groupId>
+			<artifactId>jackson-datatype-jsr310</artifactId>
 		</dependency>
 
 		<dependency>

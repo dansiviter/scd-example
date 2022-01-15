@@ -13,8 +13,9 @@
 		<class>uk.dansiviter.scd.repo.UuidConverter</class>
 
 		<!-- Entities -->
-		<class>uk.dansiviter.scd.entity.Person</class>
-		<class>uk.dansiviter.scd.entity.Point</class>
+		<class>uk.dansiviter.scd.entity.PersonEntity</class>
+		<class>uk.dansiviter.scd.entity.TimeSeriesEntity</class>
+		<class>uk.dansiviter.scd.entity.PointEntity</class>
 
 		<properties>
 			<property name="javax.persistence.schema-generation.database.action" value="create" />

@@ -3,29 +3,39 @@ package uk.dansiviter.scd.repo;
 import static java.lang.Long.toHexString;
 import static java.util.stream.StreamSupport.stream;
 
-import java.util.Objects;
+import java.util.Optional;
+import java.util.OptionalLong;
 
 import javax.enterprise.context.ApplicationScoped;
-import javax.persistence.EntityManagerFactory;
-import javax.persistence.PersistenceUnit;
+
+import uk.dansiviter.scd.rest.api.Cachable;
 
 @ApplicationScoped
 public class KeyUtil {
-	@PersistenceUnit
-	private EntityManagerFactory emf;
+	// @PersistenceUnit
+	// private EntityManagerFactory emf;
 
-	public long hash(Object entity) {
+	public OptionalLong hash(Object entity) {
 		if (entity instanceof Iterable) {
-			return hash((Iterable<?>) entity);
+			return OptionalLong.of(hash((Iterable<?>) entity));
 		}
-		return emf.getPersistenceUnitUtil().getIdentifier(entity).hashCode();
+		if (entity instanceof Optional) {
+			entity = ((Optional<?>) entity).orElse(null);
+		}
+		if (entity instanceof Cachable) {
+			return OptionalLong.of(((Cachable) entity).hash());
+		}
+		if (entity == null) {
+			return OptionalLong.empty();
+		}
+		throw new UnsupportedOperationException("Unsupported type! [" + entity + "]");
+		// return emf.getPersistenceUnitUtil().getIdentifier(entity).hashCode();
 	}
 
-	public long hash(Iterable<?> entities) {
-		var puu = emf.getPersistenceUnitUtil();
-		return stream(entities.spliterator(), false)
-			.map(puu::getIdentifier)
-			.mapToLong(Objects::hashCode)
+	private long hash(Iterable<?> entities) {
+		// var puu = emf.getPersistenceUnitUtil();
+		return  stream(entities.spliterator(), false)
+			.mapToLong(v -> hash(v).getAsLong())
 			.reduce(7L, (i, j) -> 31 *  i + j);
 	}
 
@@ -33,7 +43,11 @@ public class KeyUtil {
 		return toHexString(hash(entities));
 	}
 
-	public String eTag(Object entity) {
-		return toHexString(hash(entity));
+	public Optional<String> eTag(Object entity) {
+		var value = hash(entity);
+		if (value.isEmpty()) {
+			return Optional.empty();
+		}
+		return Optional.of(toHexString(value.getAsLong()));
 	}
 }

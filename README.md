@@ -26,9 +26,12 @@ Notes:
 
 ```
 docker run -p 8082:80 `
-	-e 'PGADMIN_DEFAULT_EMAIL=user' `
+	-e 'PGADMIN_DEFAULT_EMAIL=admin@acme.com' `
 	-e 'PGADMIN_DEFAULT_PASSWORD=pwd' `
-	-d `
 	--rm `
-	-d dpage/pgadmin4
+	-d `
+	dpage/pgadmin4
 ```
+
+
+host.docker.internal

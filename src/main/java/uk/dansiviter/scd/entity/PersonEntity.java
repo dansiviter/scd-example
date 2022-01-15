@@ -12,6 +12,7 @@ import javax.persistence.IdClass;
 import javax.persistence.Index;
 import javax.persistence.NamedNativeQuery;
 import javax.persistence.NamedQuery;
+import javax.persistence.PrePersist;
 import javax.persistence.QueryHint;
 import javax.persistence.Table;
 
@@ -21,14 +22,14 @@ import org.eclipse.persistence.annotations.ReturnInsert;
 @NamedQuery(
 	name = "Person.find",
 	query = "SELECT p " +
-		"FROM Person p " +
+		"FROM PersonEntity p " +
 		"WHERE p.name = :name " +
 		"ORDER BY p.inserted DESC",
 	hints = @QueryHint(name = "eclipselink.jdbc.max-rows", value = "1"))
 @NamedQuery(
 	name = "Person.find.instant",
 	query = "SELECT p " +
-		"FROM Person p " +
+		"FROM PersonEntity p " +
 		"WHERE p.name = :name " +
 		"AND p.inserted <= :instant " +
 		"ORDER BY p.inserted DESC",
@@ -36,16 +37,16 @@ import org.eclipse.persistence.annotations.ReturnInsert;
 @NamedQuery(
 	name = "Person.audit",
 	query = "SELECT p " +
-		"FROM Person p " +
+		"FROM PersonEntity p " +
 		"WHERE p.name = :name " +
 		"ORDER BY p.inserted DESC")
-	@NamedQuery(
+@NamedQuery(
 	name = "Person.all",
 	query = "SELECT p " +
-		"FROM Person p " +
+		"FROM PersonEntity p " +
 		"WHERE p.inserted = (" +
 			"SELECT MAX(p0.inserted) " +
-			"FROM Person p0 " +
+			"FROM PersonEntity p0 " +
 			"WHERE p0.name = p.name" +
 		")")
 @NamedNativeQuery(
@@ -57,39 +58,38 @@ import org.eclipse.persistence.annotations.ReturnInsert;
 			"FROM Person p0 " +
 			"GROUP BY p0.name" +
 	") p0",
-	resultClass = Person.class)
+	resultClass = PersonEntity.class)
 @NamedQuery(
 	name = "Person.all.instant",
 	query = "SELECT p " +
-	  "FROM Person p " +
+	  "FROM PersonEntity p " +
 		"WHERE p.inserted = (" +
 			"SELECT MAX(p0.inserted) " +
-			"FROM Person p0 " +
+			"FROM PersonEntity p0 " +
 			"WHERE p0.name = p.name " +
 			"AND p0.inserted <= :instant " +
 		")")
 @NamedQuery(
 	name = "Person.allAudit",
-	query = "SELECT p FROM Person p")
-@IdClass(Person.PersonId.class)
-@Table(indexes = @Index(columnList = "uuid", unique = true))
-public class Person implements Serializable {
-	@Column(columnDefinition = "UUID DEFAULT gen_random_uuid() NOT NULL", unique = true, insertable = false, updatable = false)
-	@ReturnInsert
+	query = "SELECT p FROM PersonEntity p")
+@IdClass(PersonEntity.PersonId.class)
+@Table(name = "person", indexes = @Index(columnList = "uuid", unique = true))
+public class PersonEntity implements BaseEntity {
+	@Column(columnDefinition = "UUID", unique = true, nullable = false)
 	private UUID uuid;
 	@Id
 	@Column(nullable = false)
 	private String name;
 	@Id
-	@Column(columnDefinition = "TIMESTAMPTZ DEFAULT (now() at time zone 'utc')", nullable = false, insertable = false)
+	@Column(columnDefinition = "TIMESTAMPTZ", nullable = false)
 	@ReturnInsert
 	private Instant inserted;
 
 	private int age;
 
-	public Person() { }
+	public PersonEntity() { }
 
-	public Person(String name, int age, Instant inserted) {
+	public PersonEntity(String name, int age, Instant inserted) {
 		this.name = name;
 		this.age = age;
 		this.inserted = inserted;
@@ -135,11 +135,18 @@ public class Person implements Serializable {
 		if (obj == null || this.getClass() != obj.getClass()) {
 			return false;
 		}
-		var other = (Person) obj;
+		var other = (PersonEntity) obj;
 		return Objects.equals(this.name, other.name) &&
 			this.age == other.age;
 	}
 
+	@PrePersist
+	public void prePersist() {
+		setInserted(Instant.now());
+		if (getUuid() == null) {
+			setUuid(UUID_GENERATOR.get());
+		}
+	}
 
 	public PersonId toId() {
 		return new PersonId(this);
@@ -152,7 +159,7 @@ public class Person implements Serializable {
 		public PersonId() {
 		}
 
-		private PersonId(Person person) {
+		private PersonId(PersonEntity person) {
 			this.name = person.name;
 			this.inserted = person.inserted;
 		}

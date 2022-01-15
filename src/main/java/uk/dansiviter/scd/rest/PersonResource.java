@@ -15,8 +15,8 @@ import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
 
-import uk.dansiviter.scd.entity.Person;
 import uk.dansiviter.scd.repo.PersonRepo;
+import uk.dansiviter.scd.rest.api.Person;
 
 @Path("v1alpha/people")
 @Produces(APPLICATION_JSON)
@@ -28,34 +28,34 @@ public class PersonResource {
 	@GET
 	@ETag
 	public List<Person> all(@QueryParam("instant") Optional<Instant> instant) {
-		return repo.all(instant);
+		return Person.from(repo.all(instant));
 	}
 
 	@GET
 	@Path("audit")
 	public List<Person> allAudit() {
-		return repo.allAudit();
+		return Person.from(repo.allAudit());
 	}
 
 	@GET
 	@Path("{name}")
 	@ETag
-	public Person get(
+	public Optional<Person> get(
 		@PathParam("name") String name,
 		@QueryParam("instant") Optional<Instant> instant)
 	{
-		return repo.get(name, instant);
+		return repo.get(name, instant).map(Person::from);
 	}
 
 	@GET
 	@Path("{name}/audit")
 	public List<Person> audit(@PathParam("name") String name) {
-		return repo.getAudit(name);
+		return Person.from(repo.getAudit(name));
 	}
 
 	@PUT
 	@ETag
 	public Person put(Person person) {
-		return repo.persist(person);
+		return Person.from(repo.persist(person.toEntity()));
 	}
 }

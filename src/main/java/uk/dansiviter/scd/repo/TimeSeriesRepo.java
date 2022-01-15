@@ -12,6 +12,7 @@ import java.time.temporal.ChronoUnit;
 import java.time.temporal.Temporal;
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
@@ -21,41 +22,56 @@ import javax.persistence.PersistenceContext;
 import org.threeten.extra.PeriodDuration;
 
 import uk.dansiviter.scd.ScdLog;
-import uk.dansiviter.scd.entity.Point;
+import uk.dansiviter.scd.entity.PointEntity;
+import uk.dansiviter.scd.entity.TimeSeriesEntity;
 import uk.dansiviter.scd.entity.Window;
 
 @ApplicationScoped
-public class PointRepo {
+public class TimeSeriesRepo {
 	@Inject
 	private ScdLog log;
 	@PersistenceContext
 	private EntityManager em;
 
-	public List<Point> points(String name) {
-		return em.createNamedQuery("Point.allByName", Point.class)
-			.setParameter(1, name)
+	public List<TimeSeriesEntity> timeSeries() {
+		return em.createNamedQuery("TimeSeries.all", TimeSeriesEntity.class)
 			.getResultList();
 	}
 
-	public List<Window> window(String name, Optional<Temporal> start, Optional<Temporal> end, PeriodDuration alignment) {
-		var startInstant = start(name, start, alignment);
-		var endInstant = end(name, startInstant, end, alignment);
-		this.log.window(name, startInstant, endInstant, alignment);
+	public List<PointEntity> points(String name) {
+		var timeSeries = em.createNamedQuery("TimeSeries.findByName", TimeSeriesEntity.class)
+				.setParameter("name", name)
+				.getSingleResult();
+		return em.createNamedQuery("Point.allByTimeSeriesId", PointEntity.class)
+			.setParameter(1, timeSeries.getId())
+			.getResultList();
+	}
+
+	public List<PointEntity> points(UUID timeSeriesId) {
+		return em.createNamedQuery("Point.allByTimeSeriesId", PointEntity.class)
+			.setParameter(1, timeSeriesId)
+			.getResultList();
+	}
+
+	public List<Window> window(UUID timeSeriesId, Optional<Temporal> start, Optional<Temporal> end, PeriodDuration alignment) {
+		var startInstant = start(timeSeriesId, start, alignment);
+		var endInstant = end(timeSeriesId, startInstant, end, alignment);
+		this.log.window(timeSeriesId, startInstant, endInstant, alignment);
 		return em.createNamedQuery("Point.window", Window.class)
 			.setParameter("start", startInstant)
 			.setParameter("end", endInstant)
-			.setParameter("name", name)
+			.setParameter("timeSeriesId", timeSeriesId)
 			.setParameter("alignment", alignment.toString())
 			.getResultList();
 	}
 
-	private OffsetDateTime start(String name, Optional<Temporal> start, PeriodDuration alignment) {
+	private OffsetDateTime start(UUID timeSeriesId, Optional<Temporal> start, PeriodDuration alignment) {
 		if (start.isPresent()) {
-			return start.map(PointRepo::toDateTime).orElseThrow();
+			return start.map(TimeSeriesRepo::toDateTime).orElseThrow();
 		}
 
 		var result = em.createNamedQuery("Point.minTime", Instant.class)
-			.setParameter("name", name)
+			.setParameter("timeSeriesId", timeSeriesId)
 			.getSingleResult()
 			.atOffset(UTC);
 
@@ -63,13 +79,13 @@ public class PointRepo {
 		return result;
 	}
 
-	private OffsetDateTime end(String name, OffsetDateTime start, Optional<Temporal> end, PeriodDuration alignment) {
+	private OffsetDateTime end(UUID timeSeriesId, OffsetDateTime start, Optional<Temporal> end, PeriodDuration alignment) {
 		if (end.isPresent()) {
-			return end.map(PointRepo::toDateTime).orElseThrow();
+			return end.map(TimeSeriesRepo::toDateTime).orElseThrow();
 		}
 
 		var result = em.createNamedQuery("Point.maxTime", Instant.class)
-			.setParameter("name", name)
+			.setParameter("timeSeriesId", timeSeriesId)
 			.getSingleResult()
 			.atOffset(UTC);
 

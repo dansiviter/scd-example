@@ -2,11 +2,13 @@ package uk.dansiviter.scd.rest;
 
 import static javax.ws.rs.HttpMethod.GET;
 import static javax.ws.rs.HttpMethod.PUT;
+import static javax.ws.rs.Priorities.HEADER_DECORATOR;
 import static javax.ws.rs.core.HttpHeaders.ETAG;
 import static javax.ws.rs.core.Response.Status.OK;
 
 import java.util.Set;
 
+import javax.annotation.Priority;
 import javax.inject.Inject;
 import javax.ws.rs.container.ContainerRequestContext;
 import javax.ws.rs.container.ContainerResponseContext;
@@ -19,6 +21,7 @@ import uk.dansiviter.scd.repo.KeyUtil;
 
 @ETag
 @Provider
+@Priority(HEADER_DECORATOR)
 public class ETagFilter implements ContainerResponseFilter {
 	private static final Set<String> METHODS = Set.of(GET, PUT);
 
@@ -31,7 +34,11 @@ public class ETagFilter implements ContainerResponseFilter {
 			return;
 		}
 
-		var eTag = new EntityTag(this.keyUtil.eTag(res.getEntity()));
+		var eTag = this.keyUtil.eTag(res.getEntity()).map(EntityTag::new);
+		eTag.ifPresent(e -> evaluate(req, res, e));
+	}
+
+	private static void evaluate(ContainerRequestContext req, ContainerResponseContext res, EntityTag eTag) {
 		var builder = req.getRequest().evaluatePreconditions(eTag);
 		if (builder != null) {
 			copy(builder, res);
