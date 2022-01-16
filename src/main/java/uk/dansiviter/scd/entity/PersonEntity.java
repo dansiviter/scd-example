@@ -3,13 +3,11 @@ package uk.dansiviter.scd.entity;
 import java.io.Serializable;
 import java.time.Instant;
 import java.util.Objects;
-import java.util.UUID;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.IdClass;
-import javax.persistence.Index;
 import javax.persistence.NamedNativeQuery;
 import javax.persistence.NamedQuery;
 import javax.persistence.PrePersist;
@@ -73,10 +71,8 @@ import org.eclipse.persistence.annotations.ReturnInsert;
 	name = "Person.allAudit",
 	query = "SELECT p FROM PersonEntity p")
 @IdClass(PersonEntity.PersonId.class)
-@Table(name = "person", indexes = @Index(columnList = "uuid", unique = true))
+@Table(name = "person")
 public class PersonEntity implements BaseEntity {
-	@Column(columnDefinition = "UUID", unique = true, nullable = false)
-	private UUID uuid;
 	@Id
 	@Column(nullable = false)
 	private String name;
@@ -93,14 +89,6 @@ public class PersonEntity implements BaseEntity {
 		this.name = name;
 		this.age = age;
 		this.inserted = inserted;
-	}
-
-	public UUID getUuid() {
-		return uuid;
-	}
-
-	public void setUuid(UUID uuid) {
-		this.uuid = uuid;
 	}
 
 	public String getName() {
@@ -143,9 +131,6 @@ public class PersonEntity implements BaseEntity {
 	@PrePersist
 	public void prePersist() {
 		setInserted(Instant.now());
-		if (getUuid() == null) {
-			setUuid(UUID_GENERATOR.get());
-		}
 	}
 
 	public PersonId toId() {

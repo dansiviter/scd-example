@@ -6,7 +6,6 @@ import static uk.dansiviter.scd.rest.api.PersonBuilder.builder;
 import java.time.Instant;
 import java.util.List;
 import java.util.Objects;
-import java.util.UUID;
 import java.util.stream.Collectors;
 
 import javax.validation.constraints.Min;
@@ -18,7 +17,6 @@ import uk.dansiviter.scd.entity.PersonEntity;
 
 @RecordBuilder
 public record Person(
-	UUID uuid,
 	@NotNull @Size(min = 3, max = 32) String name,
 	Instant inserted,
 	@Min(0) int age)
@@ -30,7 +28,6 @@ implements PersonBuilder.With {
 			.age(entity.getAge())
 			.name(entity.getName())
 			.inserted(entity.getInserted())
-			.uuid(entity.getUuid())
 			.build();
 	}
 
