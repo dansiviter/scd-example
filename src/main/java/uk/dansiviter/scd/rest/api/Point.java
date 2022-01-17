@@ -2,7 +2,6 @@ package uk.dansiviter.scd.rest.api;
 
 import java.time.Instant;
 import java.util.List;
-import java.util.UUID;
 import java.util.stream.Collectors;
 
 import javax.validation.constraints.Min;
@@ -14,7 +13,7 @@ import uk.dansiviter.scd.entity.PointEntity;
 @RecordBuilder
 public record Point(
 	@NotNull
-	UUID timeSeriesId,
+	String timeSeriesName,
 	@NotNull
 	Instant time,
 	Instant inserted,
@@ -24,7 +23,7 @@ implements PointBuilder.With
 {
 	public static Point from(PointEntity entity) {
 		return PointBuilder.builder()
-			.timeSeriesId(entity.getTimeSeriesId())
+			.timeSeriesName(entity.getTimeSeriesName())
 			.time(entity.getTime())
 			.value(entity.getValue())
 			.inserted(entity.getInserted())

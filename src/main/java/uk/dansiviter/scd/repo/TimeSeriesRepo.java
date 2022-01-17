@@ -24,7 +24,7 @@ import org.threeten.extra.PeriodDuration;
 import uk.dansiviter.scd.ScdLog;
 import uk.dansiviter.scd.entity.PointEntity;
 import uk.dansiviter.scd.entity.TimeSeriesEntity;
-import uk.dansiviter.scd.entity.Window;
+import uk.dansiviter.scd.entity.WindowEntity;
 
 @ApplicationScoped
 public class TimeSeriesRepo {
@@ -53,25 +53,27 @@ public class TimeSeriesRepo {
 			.getResultList();
 	}
 
-	public List<Window> window(UUID timeSeriesId, Optional<Temporal> start, Optional<Temporal> end, PeriodDuration alignment) {
-		var startInstant = start(timeSeriesId, start, alignment);
-		var endInstant = end(timeSeriesId, startInstant, end, alignment);
-		this.log.window(timeSeriesId, startInstant, endInstant, alignment);
-		return em.createNamedQuery("Point.window", Window.class)
-			.setParameter("start", startInstant)
-			.setParameter("end", endInstant)
-			.setParameter("timeSeriesId", timeSeriesId)
-			.setParameter("alignment", alignment.toString())
+	public List<WindowEntity> window(String name, Optional<Temporal> start, Optional<Temporal> end, PeriodDuration alignment) {
+		var startInstant = start(name, start, alignment);
+		var endInstant = end(name, startInstant, end, alignment);
+		this.log.window(name, startInstant, endInstant, alignment);
+
+		// EclipseLink does not support named parameters!
+		return em.createNamedQuery("Point.window", WindowEntity.class)
+			.setParameter(1, startInstant)
+			.setParameter(2, endInstant)
+			.setParameter(3, name)
+			.setParameter(4, alignment.toString())
 			.getResultList();
 	}
 
-	private OffsetDateTime start(UUID timeSeriesId, Optional<Temporal> start, PeriodDuration alignment) {
+	private OffsetDateTime start(String name, Optional<Temporal> start, PeriodDuration alignment) {
 		if (start.isPresent()) {
 			return start.map(TimeSeriesRepo::toDateTime).orElseThrow();
 		}
 
 		var result = em.createNamedQuery("Point.minTime", Instant.class)
-			.setParameter("timeSeriesId", timeSeriesId)
+			.setParameter("name", name)
 			.getSingleResult()
 			.atOffset(UTC);
 
@@ -79,13 +81,13 @@ public class TimeSeriesRepo {
 		return result;
 	}
 
-	private OffsetDateTime end(UUID timeSeriesId, OffsetDateTime start, Optional<Temporal> end, PeriodDuration alignment) {
+	private OffsetDateTime end(String name, OffsetDateTime start, Optional<Temporal> end, PeriodDuration alignment) {
 		if (end.isPresent()) {
 			return end.map(TimeSeriesRepo::toDateTime).orElseThrow();
 		}
 
 		var result = em.createNamedQuery("Point.maxTime", Instant.class)
-			.setParameter("timeSeriesId", timeSeriesId)
+			.setParameter("name", name)
 			.getSingleResult()
 			.atOffset(UTC);
 

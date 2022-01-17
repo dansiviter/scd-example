@@ -4,7 +4,6 @@ import java.io.Serializable;
 import java.time.Instant;
 import java.time.OffsetDateTime;
 import java.util.Objects;
-import java.util.UUID;
 
 import javax.persistence.Column;
 import javax.persistence.ColumnResult;
@@ -22,38 +21,36 @@ import org.eclipse.persistence.annotations.ReturnInsert;
 @Entity
 @NamedNativeQuery(
 	name = "Point.allByTimeSeriesId",
-	query = "SELECT * " +
-	"FROM Point p " +
-	"NATURAL JOIN (" +
-		"SELECT timeSeriesId, time, MAX(inserted) AS inserted " +
+	query = "SELECT DISTINCT(timeSeriesName, time) * " +
 		"FROM point " +
-		"WHERE timeSeriesId = ?1 " +
-		"GROUP BY timeSeriesId, time" +
-	") p0",
+		"WHERE timeSeriesName = ?1 " +
+		"GROUP BY timeSeriesName, time " +
+		"ORDER BY time, inserted DESC",
 	resultClass = PointEntity.class)
 @NamedNativeQuery(
 	name = "Point.window",
-	query = "SELECT " +
-			"ts AS start, " +
-			"ts + CAST(:alignment AS INTERVAL) AS end, " +
-			"SUM(p.value) AS value " +
-		"FROM Point p " +
-		"NATURAL JOIN (" +
-			"SELECT timeSeriesId, time, MAX(inserted) AS inserted FROM point " +
-			"WHERE timeSeriesId = :timeSeriesId " +
-			"AND time >= :start " +
-			"AND time <= :end " +
-			"GROUP BY timeSeriesId, time" +
-		") AS p0 " +
-		"RIGHT JOIN generate_series(:start, :end, CAST(:alignment AS INTERVAL)) ts " +
-		  "ON ts <= p.time AND ts + CAST(:alignment AS INTERVAL) > p.time " +
+	query = "SELECT ts AS start, " +
+ 		"ts + ?4::INTERVAL AS end, " +
+		"SUM(p.value) AS value " +
+		"FROM " +
+			"generate_series(?1::TIMESTAMPTZ, ?2::TIMESTAMPTZ, ?4::INTERVAL) ts " +
+		"LEFT JOIN (" +
+			"SELECT DISTINCT ON (timeSeriesName, time) timeSeriesName, time, value " +
+			"FROM Point " +
+			"WHERE timeSeriesName = ?3 " +
+			"AND time >= ?1::TIMESTAMPTZ " +
+			"AND time <= ?2::TIMESTAMPTZ " +
+			"GROUP BY timeSeriesName, time, inserted " +
+			"ORDER BY timeSeriesName, time, inserted DESC" +
+		") p " +
+		"ON ts <= p.time AND ts + ?4::INTERVAL > p.time " +
 		"GROUP BY ts " +
 		"ORDER BY ts",
 	resultSetMapping = "window")
-@NamedQuery(name = "Point.minTime", query = "SELECT MIN(p.time) FROM PointEntity p WHERE p.timeSeriesId = :timeSeriesId")
-@NamedQuery(name = "Point.maxTime", query = "SELECT MAX(p.time) FROM PointEntity p WHERE p.timeSeriesId = :timeSeriesId")
+@NamedQuery(name = "Point.minTime", query = "SELECT MIN(p.time) FROM PointEntity p WHERE p.timeSeriesName = :name")
+@NamedQuery(name = "Point.maxTime", query = "SELECT MAX(p.time) FROM PointEntity p WHERE p.timeSeriesName = :name")
 @SqlResultSetMapping(name = "window", classes = @ConstructorResult(
-	targetClass = Window.class,
+	targetClass = WindowEntity.class,
 	columns = {
 		@ColumnResult(name = "start", type = OffsetDateTime.class),
 		@ColumnResult(name = "end", type = OffsetDateTime.class),
@@ -64,8 +61,8 @@ import org.eclipse.persistence.annotations.ReturnInsert;
 @IdClass(PointEntity.PointId.class)
 public class PointEntity implements BaseEntity {
 	@Id
-	@Column(columnDefinition = "UUID", nullable = false)
-	private UUID timeSeriesId;
+	@Column(nullable = false)
+	private String timeSeriesName;
 	@Id
 	@Column(columnDefinition = "TIMESTAMPTZ", nullable = false)
 	private Instant time;
@@ -76,12 +73,12 @@ public class PointEntity implements BaseEntity {
 	@Column(nullable = false)
 	private Long value;
 
-	public UUID getTimeSeriesId() {
-		return timeSeriesId;
+	public String getTimeSeriesName() {
+		return timeSeriesName;
 	}
 
-	public void setTimeSeriesId(UUID timeSeriesId) {
-		this.timeSeriesId = timeSeriesId;
+	public void setTimeSeriesName(String timeSeriesName) {
+		this.timeSeriesName = timeSeriesName;
 	}
 
 	public Instant getTime() {
@@ -114,7 +111,7 @@ public class PointEntity implements BaseEntity {
 	}
 
 	public static class PointId implements Serializable {
-		private UUID timeSeriesId;
+		private String timeSeriesName;
 		private Instant time;
 		private Instant inserted;
 
@@ -122,17 +119,17 @@ public class PointEntity implements BaseEntity {
 		}
 
 		private PointId(PointEntity point) {
-			this.timeSeriesId = point.timeSeriesId;
+			this.timeSeriesName = point.timeSeriesName;
 			this.time = point.time;
 			this.inserted = point.inserted;
 		}
 
-		public UUID getTimeSeriesId() {
-			return timeSeriesId;
+		public String getTimeSeriesName() {
+			return timeSeriesName;
 		}
 
-		public void setTimeSeriesId(UUID timeSeriesId) {
-			this.timeSeriesId = timeSeriesId;
+		public void setTimeSeriesName(String timeSeriesName) {
+			this.timeSeriesName = timeSeriesName;
 		}
 
 		public Instant getTime() {
@@ -160,14 +157,14 @@ public class PointEntity implements BaseEntity {
 				return false;
 			}
 			var other = (PointId) obj;
-			return Objects.equals(this.timeSeriesId, other.timeSeriesId) &&
+			return Objects.equals(this.timeSeriesName, other.timeSeriesName) &&
 				Objects.equals(this.time, other.time) &&
 				Objects.equals(this.inserted, other.inserted);
 		}
 
 		@Override
 		public int hashCode() {
-			return Objects.hash(this.timeSeriesId, this.time, this.inserted);
+			return Objects.hash(this.timeSeriesName, this.time, this.inserted);
 		}
 	}
 }

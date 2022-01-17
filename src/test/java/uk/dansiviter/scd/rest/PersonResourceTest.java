@@ -36,14 +36,18 @@ class PersonResourceTest {
 	@Inject
 	WebTarget webTarget;
 
+	WebTarget base() {
+		return this.webTarget.path(BASE);
+	}
+
 	@Test
 	void persons() {
-		var actual = webTarget.path(BASE).path("Glenn").request().get();
+		var actual = base().path("Glenn").request().get();
 		assertThat(actual.getStatus(), is(NO_CONTENT.getStatusCode()));
 
 		// put first 'Glenn'
 		var person = PersonBuilder.builder().name("Glenn").age(61).build();
-		actual = webTarget.path(BASE).request().put(Entity.entity(person, APPLICATION_JSON));
+		actual = base().request().put(Entity.entity(person, APPLICATION_JSON));
 		assertThat(actual.getStatus(), is(OK.getStatusCode()));
 		var created0 = actual.readEntity(Person.class);
 		assertThat(created0.inserted(), notNullValue());
@@ -51,7 +55,7 @@ class PersonResourceTest {
 
 		// put newer record with a change
 		person = person.withAge(62);
-		actual = webTarget.path(BASE).request().put(Entity.entity(person, APPLICATION_JSON));
+		actual = base().request().put(Entity.entity(person, APPLICATION_JSON));
 		assertThat(actual.getStatus(), is(OK.getStatusCode()));
 		var created1 = actual.readEntity(Person.class);
 		assertThat(created0, is(not(created1)));
@@ -59,7 +63,7 @@ class PersonResourceTest {
 		assertThat(actual.getHeaderString(ETAG), is(not(eTag(created0).toString())));
 
 		// try put, idempotent
-		actual = webTarget.path(BASE).request().put(Entity.entity(person, APPLICATION_JSON));
+		actual = base().request().put(Entity.entity(person, APPLICATION_JSON));
 		assertThat(actual.getStatus(), is(OK.getStatusCode()));
 		var created2 = actual.readEntity(Person.class);
 		assertThat(created1, is(created2));
@@ -67,18 +71,18 @@ class PersonResourceTest {
 		assertThat(actual.getHeaderString(ETAG), is(eTag(created1).toString()));
 
 		// get 'Glenn' audit
-		actual = webTarget.path(BASE).path("Glenn/audit").request().get();
+		actual = base().path("Glenn/audit").request().get();
 		var audit = actual.readEntity(new GenericType<List<Person>>() {});
 		assertThat(audit, hasSize(2));
 		assertThat(audit.get(0).inserted(), greaterThan(audit.get(1).inserted()));
 
 		// check latest is correct
-		actual = webTarget.path(BASE).path("Glenn").request().get();
+		actual = base().path("Glenn").request().get();
 		var Glenn = actual.readEntity(Person.class);
 		assertThat(Glenn, is(created2));
 
 		// check E-Tag worked
-		actual = webTarget.path(BASE).path("Glenn").request()
+		actual = base().path("Glenn").request()
 			.header("If-None-Match", eTag(Glenn))
 			.get();
 		assertThat(actual.getStatus(), is(NOT_MODIFIED.getStatusCode()));
@@ -86,27 +90,27 @@ class PersonResourceTest {
 
 		// put new person 'Jillian'
 		person = person.with().name("Jillian").age(39).build();
-		actual = webTarget.path(BASE).request().put(entity(person, APPLICATION_JSON));
+		actual = base().request().put(entity(person, APPLICATION_JSON));
 		assertThat(actual.getStatus(), is(OK.getStatusCode()));
 		var jillian = actual.readEntity(Person.class);
 
 		// get Jane
-		actual = webTarget.path(BASE).path("Jillian").request().get();
+		actual = base().path("Jillian").request().get();
 		assertThat(actual.readEntity(Person.class), is(jillian));
 
 		// get latest persons
-		actual = webTarget.path(BASE).request().get();
+		actual = base().request().get();
 		var all = actual.readEntity(new GenericType<List<Person>>() {});
 		assertThat(all, hasSize(8));
 		assertThat(all, hasItem(hasRecordComponent("name", is("Jillian"))));
 		assertThat(all, hasItem(hasRecordComponent("name", is("Glenn"))));
 
-		actual = webTarget.path(BASE).path("audit").request().get();
+		actual = base().path("audit").request().get();
 		var allAudit = actual.readEntity(new GenericType<List<Person>>() {});
 		assertThat(allAudit, hasSize(9));
 
 		// check we can get value at a particular point in time (i.e. first one)
-		actual = webTarget.path(BASE).path("Glenn").queryParam("instant", created0.inserted()).request().get();
+		actual = base().path("Glenn").queryParam("instant", created0.inserted()).request().get();
 		assertThat(actual.readEntity(Person.class), is(created0));
 	}
 
