@@ -1,4 +1,4 @@
-[![GitHub Workflow Status](https://img.shields.io/github/workflow/status/dansiviter/scd-example/Build?style=flat-square)](https://github.com/dansiviter/scd-example/actions/workflows/build.yaml) ![Java 16](https://img.shields.io/badge/-Java%2016-informational?style=flat-square)
+[![GitHub Workflow Status](https://img.shields.io/github/workflow/status/dansiviter/scd-example/Build?style=flat-square)](https://github.com/dansiviter/scd-example/actions/workflows/build.yaml) ![Java 17](https://img.shields.io/badge/-Java%2017-informational?style=flat-square)
 
 # Slowly Changing Dimension (SCD) Example #
 
@@ -24,6 +24,8 @@ Notes:
 * If you want to view your data, go to [`localhost:8082`](http://localhost:8082) and use JDBC URL `jdbc:h2:mem:app`,
 * Some of the queries use correlated subqueries, which _can_ be a concern but this can be mitigated with indexes on the correlation criteria and some DBs can rewrite them.
 
+
+To run pgAdmin:
 ```
 docker run -p 8082:80 `
 	-e 'PGADMIN_DEFAULT_EMAIL=admin@acme.com' `
@@ -33,5 +35,4 @@ docker run -p 8082:80 `
 	dpage/pgadmin4
 ```
 
-
-host.docker.internal
+When the application is running locally you can then connect to your database using: `host.docker.internal:<port>`
