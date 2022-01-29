@@ -23,11 +23,11 @@ import org.eclipse.persistence.annotations.ReturnInsert;
 @Entity
 @NamedNativeQuery(
 	name = "Point.allByTimeSeriesId",
-	query = "SELECT DISTINCT(timeSeriesName, time) * " +
+	query = "SELECT DISTINCT ON (timeSeriesName, time) * " +
 		"FROM point " +
 		"WHERE timeSeriesName = ?1 " +
-		"GROUP BY timeSeriesName, time " +
-		"ORDER BY time, inserted DESC",
+		"GROUP BY timeSeriesName, time, inserted " +
+		"ORDER BY timeSeriesName, time, inserted DESC",
 	resultClass = PointEntity.class)
 @NamedNativeQuery(
 	name = "Point.window",

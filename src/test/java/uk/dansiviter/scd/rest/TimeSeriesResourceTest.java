@@ -16,6 +16,7 @@ import javax.ws.rs.core.GenericType;
 import org.junit.jupiter.api.Test;
 
 import io.helidon.microprofile.tests.junit5.HelidonTest;
+import uk.dansiviter.scd.rest.api.TimeSeries;
 import uk.dansiviter.scd.rest.api.Window;
 
 @HelidonTest
@@ -30,13 +31,26 @@ class TimeSeriesResourceTest {
 	}
 
 	@Test
-	void get() {
+	void getAll() {
+		var actual = base().request().get();
+		assertThat(actual.getStatus(), is(OK.getStatusCode()));
+
+		var timeseries = actual.readEntity(new GenericType<List<TimeSeries>>() {});
+
+		assertThat(timeseries, hasSize(2));
+	}
+
+	@Test
+	void getWindows() {
 		var actual = base().path("apples/windows").request().get();
 		assertThat(actual.getStatus(), is(OK.getStatusCode()));
 
 		var windows = actual.readEntity(new GenericType<List<Window>>() {});
 
 		assertThat(windows, hasSize(12));
-		assertThat(windows.get(5), is(new Window(Instant.parse("2021-07-05T00:10:00Z"), Instant.parse("2021-07-06T00:10:00Z"), new BigDecimal("30.00"))));
+		assertThat(windows.get(5), is(new Window(
+			Instant.parse("2021-07-05T00:10:00Z"),
+			Instant.parse("2021-07-06T00:10:00Z"),
+			new BigDecimal("30.00"))));
 	}
 }

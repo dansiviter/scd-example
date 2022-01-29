@@ -3,7 +3,6 @@ package uk.dansiviter.scd.entity;
 import java.io.Serializable;
 import java.time.Instant;
 import java.util.Objects;
-import java.util.UUID;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -12,7 +11,6 @@ import javax.persistence.IdClass;
 import javax.persistence.Index;
 import javax.persistence.NamedNativeQuery;
 import javax.persistence.NamedQuery;
-import javax.persistence.PrePersist;
 import javax.persistence.QueryHint;
 import javax.persistence.Table;
 
@@ -25,49 +23,35 @@ import org.eclipse.persistence.annotations.ReturnInsert;
 	query = "SELECT * " +
 		"FROM time_series ts " +
 		"NATURAL JOIN (" +
-			"SELECT ts0.id, MAX(ts0.inserted) AS inserted " +
+			"SELECT ts0.name, MAX(ts0.inserted) AS inserted " +
 			"FROM time_series ts0 " +
 			"WHERE ts0.name = :name " +
-			"GROUP BY ts0.id" +
+			"GROUP BY ts0.name" +
 	") ts",
 	resultClass = TimeSeriesEntity.class)
 @NamedQuery(
 	name = "TimeSeries.find",
 	query = "SELECT ts " +
 		"FROM TimeSeriesEntity ts " +
-		"WHERE ts.id = :id " +
+		"WHERE ts.name = :name " +
 		"ORDER BY ts.inserted DESC",
 	hints = @QueryHint(name = "eclipselink.jdbc.max-rows", value = "1"))
 @NamedNativeQuery(
 	name = "TimeSeries.all",
-	query = "SELECT * " +
-		"FROM timeseries " +
-		"NATURAL JOIN (" +
-			"SELECT ts0.id, MAX(ts0.inserted) AS inserted " +
-			"FROM time_series ts0 " +
-			"GROUP BY ts0.id" +
-	") ts",
+	query = "SELECT DISTINCT ON (name) * " +
+		"FROM time_series " +
+		"GROUP BY name, inserted " +
+		"ORDER BY name, inserted DESC",
 	resultClass = TimeSeriesEntity.class)
-@Table(name = "time_series", indexes = @Index(name = "timeseries_idx", columnList = "id, name, inserted DESC", unique = true))
+@Table(name = "time_series", indexes = @Index(name = "timeseries_idx", columnList = "name, inserted DESC", unique = true))
 public class TimeSeriesEntity implements BaseEntity {
 	@Id
-	@Column(columnDefinition = "UUID", unique = true, nullable = false)
-	private UUID id;
+	private String name;
 	@Id
 	@Column(columnDefinition = "TIMESTAMPTZ DEFAULT (now() at time zone 'utc')", nullable = false)
 	@ReturnInsert
 	private Instant inserted;
-	@Column(nullable = false)
-	private String name;
 	private String description;
-
-	public UUID getId() {
-		return id;
-	}
-
-	public void setId(UUID id) {
-		this.id = id;
-	}
 
 	public Instant getInserted() {
 		return inserted;
@@ -93,30 +77,23 @@ public class TimeSeriesEntity implements BaseEntity {
 		this.description = description;
 	}
 
-	@PrePersist
-	public void prePersist() {
-		if (getId() == null) {
-			setId(UUID_GENERATOR.get());
-		}
-	}
-
 	public static class TimeSeriesId implements Serializable {
-		private UUID id;
+		private String name;
 		private Instant inserted;
 
 		public TimeSeriesId() { }
 
 		public TimeSeriesId(TimeSeriesEntity timeSeries) {
-			this.id = timeSeries.id;
+			this.name = timeSeries.name;
 			this.inserted = timeSeries.inserted;
 		}
 
-		public UUID getId() {
-			return id;
+		public String getName() {
+			return name;
 		}
 
-		public void setId(UUID id) {
-			this.id = id;
+		public void setName(String name) {
+			this.name = name;
 		}
 
 		public Instant getInserted() {
@@ -136,12 +113,13 @@ public class TimeSeriesEntity implements BaseEntity {
 				return false;
 			}
 			var other = (TimeSeriesId) obj;
-			return Objects.equals(this.id, other.id) && Objects.equals(this.inserted, other.inserted);
+			return Objects.equals(this.name, other.name) &&
+				Objects.equals(this.inserted, other.inserted);
 		}
 
 		@Override
 		public int hashCode() {
-			return Objects.hash(this.id, this.inserted);
+			return Objects.hash(this.name, this.inserted);
 		}
 	}
 }

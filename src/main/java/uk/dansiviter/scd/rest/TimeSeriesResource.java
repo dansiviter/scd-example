@@ -1,11 +1,11 @@
 package uk.dansiviter.scd.rest;
 
+import static java.util.stream.Collectors.toList;
 import static javax.ws.rs.core.MediaType.APPLICATION_JSON;
 
 import java.time.temporal.Temporal;
 import java.util.List;
 import java.util.Optional;
-import java.util.UUID;
 import java.util.stream.Collectors;
 
 import javax.inject.Inject;
@@ -19,8 +19,10 @@ import javax.ws.rs.QueryParam;
 
 import org.threeten.extra.PeriodDuration;
 
+import uk.dansiviter.scd.entity.TimeSeriesEntity;
 import uk.dansiviter.scd.repo.TimeSeriesRepo;
 import uk.dansiviter.scd.rest.api.Point;
+import uk.dansiviter.scd.rest.api.TimeSeries;
 import uk.dansiviter.scd.rest.api.Window;
 
 @Path("v1alpha/timeseries")
@@ -30,9 +32,20 @@ public class TimeSeriesResource {
 	private TimeSeriesRepo repo;
 
 	@GET
-	@Path("{timeSeriesId}")
-	public List<Point> points(@PathParam("timeSeriesId") UUID timeSeriesId) {
-		return Point.from(repo.points(timeSeriesId));
+	public List<TimeSeries> timeSeries() {
+		var stream = repo.timeSeries().stream();
+		return stream.map(this::map).collect(toList());
+	}
+
+	private TimeSeries map(TimeSeriesEntity ts) {
+		var points = repo.points(ts.getName());
+		return TimeSeries.from(ts, points);
+	}
+
+	@GET
+	@Path("{timeSeriesName}/points")
+	public List<Point> points(@PathParam("timeSeriesName") String timeSeriesName) {
+		return Point.from(repo.points(timeSeriesName));
 	}
 
 	@GET

@@ -12,7 +12,6 @@ import java.time.temporal.ChronoUnit;
 import java.time.temporal.Temporal;
 import java.util.List;
 import java.util.Optional;
-import java.util.UUID;
 
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
@@ -38,18 +37,9 @@ public class TimeSeriesRepo {
 			.getResultList();
 	}
 
-	public List<PointEntity> points(String name) {
-		var timeSeries = em.createNamedQuery("TimeSeries.findByName", TimeSeriesEntity.class)
-				.setParameter("name", name)
-				.getSingleResult();
+	public List<PointEntity> points(String timeSeriesName) {
 		return em.createNamedQuery("Point.allByTimeSeriesId", PointEntity.class)
-			.setParameter(1, timeSeries.getId())
-			.getResultList();
-	}
-
-	public List<PointEntity> points(UUID timeSeriesId) {
-		return em.createNamedQuery("Point.allByTimeSeriesId", PointEntity.class)
-			.setParameter(1, timeSeriesId)
+			.setParameter(1, timeSeriesName)
 			.getResultList();
 	}
 

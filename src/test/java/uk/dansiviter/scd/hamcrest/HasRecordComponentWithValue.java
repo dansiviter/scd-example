@@ -8,13 +8,14 @@ import java.lang.reflect.Method;
 import java.lang.reflect.RecordComponent;
 
 import org.hamcrest.Condition;
+import org.hamcrest.Condition.Step;
 import org.hamcrest.Description;
 import org.hamcrest.Factory;
 import org.hamcrest.Matcher;
 import org.hamcrest.TypeSafeDiagnosingMatcher;
 
 public class HasRecordComponentWithValue<T> extends TypeSafeDiagnosingMatcher<T> {
-	private static final Condition.Step<RecordComponent, Method> WITH_READ_METHOD = withReadMethod();
+	private static final Step<RecordComponent, Method> WITH_READ_METHOD = withReadMethod();
 	private final String componentName;
 	private final Matcher<Object> valueMatcher;
 
@@ -32,13 +33,13 @@ public class HasRecordComponentWithValue<T> extends TypeSafeDiagnosingMatcher<T>
 								.matching(valueMatcher, "record component'" + componentName + "' ");
 	}
 
-	private Condition.Step<Method, Object> withPropertyValue(final T bean) {
-			return new Condition.Step<Method, Object>() {
+	private Step<Method, Object> withPropertyValue(T bean) {
+			return new Step<Method, Object>() {
 					@Override
 					public Condition<Object> apply(Method readMethod, Description mismatch) {
 							try {
 									return matched(readMethod.invoke(bean, NO_ARGUMENTS), mismatch);
-							} catch (Exception e) {
+							} catch (ReflectiveOperationException e) {
 									mismatch.appendText(e.getMessage());
 									return notMatched();
 							}
