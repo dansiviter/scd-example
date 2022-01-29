@@ -5,6 +5,8 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.is;
 
+import java.math.BigDecimal;
+import java.time.Instant;
 import java.util.List;
 
 import javax.inject.Inject;
@@ -35,5 +37,6 @@ class TimeSeriesResourceTest {
 		var windows = actual.readEntity(new GenericType<List<Window>>() {});
 
 		assertThat(windows, hasSize(12));
+		assertThat(windows.get(5), is(new Window(Instant.parse("2021-07-05T00:10:00Z"), Instant.parse("2021-07-06T00:10:00Z"), new BigDecimal("30.00"))));
 	}
 }

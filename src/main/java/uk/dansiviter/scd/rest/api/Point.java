@@ -1,5 +1,6 @@
 package uk.dansiviter.scd.rest.api;
 
+import java.math.BigDecimal;
 import java.time.Instant;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -18,7 +19,7 @@ public record Point(
 	Instant time,
 	Instant inserted,
 	@Min(0)
-	Long value)
+	BigDecimal value)
 implements PointBuilder.With
 {
 	public static Point from(PointEntity entity) {

@@ -1,6 +1,7 @@
 package uk.dansiviter.scd.entity;
 
 import java.io.Serializable;
+import java.math.BigDecimal;
 import java.time.Instant;
 import java.time.OffsetDateTime;
 import java.util.Objects;
@@ -11,6 +12,7 @@ import javax.persistence.ConstructorResult;
 import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.IdClass;
+import javax.persistence.Index;
 import javax.persistence.NamedNativeQuery;
 import javax.persistence.NamedQuery;
 import javax.persistence.SqlResultSetMapping;
@@ -54,10 +56,10 @@ import org.eclipse.persistence.annotations.ReturnInsert;
 	columns = {
 		@ColumnResult(name = "start", type = OffsetDateTime.class),
 		@ColumnResult(name = "end", type = OffsetDateTime.class),
-		@ColumnResult(name = "value", type = Long.class)
+		@ColumnResult(name = "value", type = BigDecimal.class)
 	})
 )
-@Table(name = "point")
+@Table(name = "point", indexes = @Index(name = "point_idx", columnList = "timeSeriesName, time DESC, inserted DESC"))
 @IdClass(PointEntity.PointId.class)
 public class PointEntity implements BaseEntity {
 	@Id
@@ -70,8 +72,8 @@ public class PointEntity implements BaseEntity {
 	@Column(columnDefinition = "TIMESTAMPTZ DEFAULT (now() at time zone 'utc')", nullable = false)
 	@ReturnInsert
 	private Instant inserted;
-	@Column(nullable = false)
-	private Long value;
+	@Column(columnDefinition = "NUMERIC", nullable = false)
+	private BigDecimal value;
 
 	public String getTimeSeriesName() {
 		return timeSeriesName;
@@ -97,11 +99,11 @@ public class PointEntity implements BaseEntity {
 		this.inserted = inserted;
 	}
 
-	public Long getValue() {
+	public BigDecimal getValue() {
 		return value;
 	}
 
-	public void setValue(Long value) {
+	public void setValue(BigDecimal value) {
 		this.value = value;
 	}
 

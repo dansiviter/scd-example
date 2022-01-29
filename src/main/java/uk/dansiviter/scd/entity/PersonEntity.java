@@ -8,6 +8,7 @@ import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.IdClass;
+import javax.persistence.Index;
 import javax.persistence.NamedNativeQuery;
 import javax.persistence.NamedQuery;
 import javax.persistence.PrePersist;
@@ -71,7 +72,7 @@ import org.eclipse.persistence.annotations.ReturnInsert;
 	name = "Person.allAudit",
 	query = "SELECT p FROM PersonEntity p")
 @IdClass(PersonEntity.PersonId.class)
-@Table(name = "person")
+@Table(name = "person", indexes = @Index(name = "person_idx", columnList = "name, inserted DESC"))
 public class PersonEntity implements BaseEntity {
 	@Id
 	@Column(nullable = false)

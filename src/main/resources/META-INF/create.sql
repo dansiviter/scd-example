@@ -10,7 +10,7 @@ INSERT INTO TIME_SERIES (id, inserted, name, description) VALUES ('1ec70869-b2d3
 INSERT INTO POINT (timeseriesname, time, value, inserted) VALUES ('apples', TIMESTAMPTZ '2021-06-30 00:10:00.000000+00', 10, now());
 INSERT INTO POINT (timeseriesname, time, value, inserted) VALUES ('apples', TIMESTAMPTZ '2021-07-05 11:10:00.123456+00', 10, now());
 INSERT INTO POINT (timeseriesname, time, value, inserted) VALUES ('apples', TIMESTAMPTZ '2021-07-05 12:00:00.000000+00', 10, now());
-INSERT INTO POINT (timeseriesname, time, value, inserted) VALUES ('apples', TIMESTAMPTZ '2021-07-05 12:10:00.000000+00', 10, now());
+INSERT INTO POINT (timeseriesname, time, value, inserted) VALUES ('apples', TIMESTAMPTZ '2021-07-05 12:10:00.000000+00', 10.00, now());
 INSERT INTO POINT (timeseriesname, time, value, inserted) VALUES ('apples', TIMESTAMPTZ '2021-07-07 12:00:00.000000+00', 10, now());
 INSERT INTO POINT (timeseriesname, time, value, inserted) VALUES ('apples', TIMESTAMPTZ '2021-07-08 12:10:00.000000+00', 10, now());
 INSERT INTO POINT (timeseriesname, time, value, inserted) VALUES ('apples', TIMESTAMPTZ '2021-07-08 12:10:00.000000+00', 11, now() + INTERVAL '1 hour');

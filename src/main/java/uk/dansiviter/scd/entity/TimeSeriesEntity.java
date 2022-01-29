@@ -48,7 +48,7 @@ import org.eclipse.persistence.annotations.ReturnInsert;
 			"GROUP BY ts0.id" +
 	") ts",
 	resultClass = TimeSeriesEntity.class)
-@Table(name = "time_series", indexes = @Index(columnList = "id, inserted, name", unique = true))
+@Table(name = "time_series", indexes = @Index(name = "timeseries_idx", columnList = "id, name, inserted DESC", unique = true))
 public class TimeSeriesEntity implements BaseEntity {
 	@Id
 	@Column(columnDefinition = "UUID", unique = true, nullable = false)
