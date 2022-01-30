@@ -3,6 +3,7 @@ package uk.dansiviter.scd.repo;
 import static java.util.Objects.requireNonNull;
 
 import java.time.Instant;
+import java.time.ZoneOffset;
 import java.util.List;
 import java.util.Optional;
 
@@ -22,28 +23,32 @@ public class PersonRepo {
 	public List<PersonEntity> all(Optional<Instant> instant) {
 		var query = instant
 			.map(i -> em.createNamedQuery("Person.all.instant", PersonEntity.class).setParameter("instant", i))
-			.orElse(em.createNamedQuery("Person.all.native", PersonEntity.class));
+			.orElse(em.createNamedQuery("Person.all", PersonEntity.class));
 		return query.getResultList();
 	}
 
 	public List<PersonEntity> allAudit() {
-		return em.createNamedQuery("Person.allAudit", PersonEntity.class).getResultList();
+		return em.createNamedQuery("Person.all.audit", PersonEntity.class).getResultList();
 	}
 
 	public Optional<PersonEntity> get(String name, Optional<Instant> instant) {
 		try {
 			var query = instant
-				.map(i -> em.createNamedQuery("Person.find.instant", PersonEntity.class).setParameter("instant", i))
+				.map(i ->
+					em.createNamedQuery("Person.find.instant", PersonEntity.class)
+						.setParameter("2", i.atOffset(ZoneOffset.UTC)))
 				.orElse(em.createNamedQuery("Person.find", PersonEntity.class));
-			return Optional.ofNullable(query.setParameter("name", name).getSingleResult());
+			return Optional.ofNullable(query
+				.setParameter(1, requireNonNull(name))
+				.getSingleResult());
 		} catch (NoResultException e) {
 			return Optional.empty();
 		}
 	}
 
 	public List<PersonEntity> getAudit(String name) {
-		return em.createNamedQuery("Person.audit", PersonEntity.class)
-			.setParameter("name", requireNonNull(name))
+		return em.createNamedQuery("Person.find.audit", PersonEntity.class)
+			.setParameter(1, requireNonNull(name))
 			.getResultList();
 	}
 

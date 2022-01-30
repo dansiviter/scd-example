@@ -38,7 +38,7 @@ public class TimeSeriesRepo {
 	}
 
 	public List<PointEntity> points(String timeSeriesName) {
-		return em.createNamedQuery("Point.allByTimeSeriesId", PointEntity.class)
+		return em.createNamedQuery("Point.allByTimeSeriesName", PointEntity.class)
 			.setParameter(1, timeSeriesName)
 			.getResultList();
 	}

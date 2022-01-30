@@ -10,67 +10,57 @@ import javax.persistence.Id;
 import javax.persistence.IdClass;
 import javax.persistence.Index;
 import javax.persistence.NamedNativeQuery;
-import javax.persistence.NamedQuery;
 import javax.persistence.PrePersist;
-import javax.persistence.QueryHint;
 import javax.persistence.Table;
 
 import org.eclipse.persistence.annotations.ReturnInsert;
 
 @Entity
-@NamedQuery(
-	name = "Person.find",
-	query = "SELECT p " +
-		"FROM PersonEntity p " +
-		"WHERE p.name = :name " +
-		"ORDER BY p.inserted DESC",
-	hints = @QueryHint(name = "eclipselink.jdbc.max-rows", value = "1"))
-@NamedQuery(
-	name = "Person.find.instant",
-	query = "SELECT p " +
-		"FROM PersonEntity p " +
-		"WHERE p.name = :name " +
-		"AND p.inserted <= :instant " +
-		"ORDER BY p.inserted DESC",
-	hints = @QueryHint(name = "eclipselink.jdbc.max-rows", value = "1"))
-@NamedQuery(
-	name = "Person.audit",
-	query = "SELECT p " +
-		"FROM PersonEntity p " +
-		"WHERE p.name = :name " +
-		"ORDER BY p.inserted DESC")
-@NamedQuery(
-	name = "Person.all",
-	query = "SELECT p " +
-		"FROM PersonEntity p " +
-		"WHERE p.inserted = (" +
-			"SELECT MAX(p0.inserted) " +
-			"FROM PersonEntity p0 " +
-			"WHERE p0.name = p.name" +
-		")")
 @NamedNativeQuery(
-	name = "Person.all.native",
-	query = "SELECT * " +
-		"FROM Person p " +
-		"NATURAL JOIN (" +
-			"SELECT p0.name, MAX(p0.inserted) AS inserted " +
-			"FROM Person p0 " +
-			"GROUP BY p0.name" +
-	") p0",
+	name = "Person.find",
+	query = "SELECT DISTINCT ON (name) * " +
+		"FROM person " +
+		"WHERE name = ?1 " +
+		"GROUP BY name, inserted " +
+		"ORDER BY name, inserted DESC",
 	resultClass = PersonEntity.class)
-@NamedQuery(
+@NamedNativeQuery(
+	name = "Person.find.instant",
+	query = "SELECT DISTINCT ON (name) * " +
+		"FROM person " +
+		"WHERE name = ?1 " +
+		"AND inserted <= ?2 " +
+		"GROUP BY name, inserted " +
+		"ORDER BY name, inserted DESC",
+	resultClass = PersonEntity.class)
+@NamedNativeQuery(
+	name = "Person.find.audit",
+	query = "SELECT * " +
+		"FROM person " +
+		"WHERE name = ?1 " +
+		"ORDER BY inserted DESC",
+	resultClass = PersonEntity.class)
+@NamedNativeQuery(
+	name = "Person.all",
+	query = "SELECT DISTINCT ON (name) * " +
+		"FROM person " +
+		"GROUP BY name, inserted " +
+		"ORDER BY name, inserted DESC",
+	resultClass = PersonEntity.class)
+@NamedNativeQuery(
+	name = "Person.all.audit",
+	query = "SELECT * " +
+		"FROM person " +
+		"ORDER BY inserted DESC",
+	resultClass = PersonEntity.class)
+@NamedNativeQuery(
 	name = "Person.all.instant",
-	query = "SELECT p " +
-	  "FROM PersonEntity p " +
-		"WHERE p.inserted = (" +
-			"SELECT MAX(p0.inserted) " +
-			"FROM PersonEntity p0 " +
-			"WHERE p0.name = p.name " +
-			"AND p0.inserted <= :instant " +
-		")")
-@NamedQuery(
-	name = "Person.allAudit",
-	query = "SELECT p FROM PersonEntity p")
+	query = "SELECT DISTINCT ON (name) * " +
+		"FROM person " +
+		"WHERE inserted <= ?2 " +
+		"GROUP BY name, inserted " +
+		"ORDER BY name, inserted DESC",
+	resultClass = PersonEntity.class)
 @IdClass(PersonEntity.PersonId.class)
 @Table(name = "person", indexes = @Index(name = "person_idx", columnList = "name, inserted DESC"))
 public class PersonEntity implements BaseEntity {

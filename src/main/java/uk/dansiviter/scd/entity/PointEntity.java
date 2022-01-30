@@ -22,7 +22,7 @@ import org.eclipse.persistence.annotations.ReturnInsert;
 
 @Entity
 @NamedNativeQuery(
-	name = "Point.allByTimeSeriesId",
+	name = "Point.allByTimeSeriesName",
 	query = "SELECT DISTINCT ON (timeSeriesName, time) * " +
 		"FROM point " +
 		"WHERE timeSeriesName = ?1 " +
