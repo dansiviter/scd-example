@@ -3,6 +3,8 @@ package uk.dansiviter.scd.repo;
 import static java.time.ZoneOffset.UTC;
 import static java.time.temporal.TemporalAdjusters.firstDayOfMonth;
 import static java.time.temporal.TemporalAdjusters.firstDayOfYear;
+import static java.util.stream.Collectors.toList;
+import static uk.dansiviter.scd.Pair.pair;
 
 import java.time.Instant;
 import java.time.LocalDate;
@@ -16,10 +18,13 @@ import java.util.Optional;
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
 import javax.persistence.EntityManager;
+import javax.persistence.NoResultException;
 import javax.persistence.PersistenceContext;
+import javax.transaction.Transactional;
 
 import org.threeten.extra.PeriodDuration;
 
+import uk.dansiviter.scd.Pair;
 import uk.dansiviter.scd.ScdLog;
 import uk.dansiviter.scd.entity.PointEntity;
 import uk.dansiviter.scd.entity.TimeSeriesEntity;
@@ -43,6 +48,27 @@ public class TimeSeriesRepo {
 			.getResultList();
 	}
 
+	private Optional<TimeSeriesEntity> find(TimeSeriesEntity timeSeries) {
+		try {
+			return Optional.of(em.createNamedQuery("TimeSeries.find", TimeSeriesEntity.class)
+				.setParameter("name", timeSeries.getName())
+				.getSingleResult());
+		} catch (NoResultException e) {
+			return Optional.empty();
+		}
+	}
+
+	private Optional<PointEntity> find(PointEntity point) {
+		try {
+			return Optional.of(em.createNamedQuery("Point.find", PointEntity.class)
+				.setParameter(1, point.getTimeSeriesName())
+				.setParameter(2, point.getTime().atOffset(UTC))
+				.getSingleResult());
+		} catch (NoResultException e) {
+			return Optional.empty();
+		}
+	}
+
 	public List<WindowEntity> window(String name, Optional<Temporal> start, Optional<Temporal> end, PeriodDuration alignment) {
 		var startInstant = start(name, start, alignment);
 		var endInstant = end(name, startInstant, end, alignment);
@@ -55,6 +81,31 @@ public class TimeSeriesRepo {
 			.setParameter(3, name)
 			.setParameter(4, alignment.toString())
 			.getResultList();
+	}
+
+	@Transactional
+	public Pair<TimeSeriesEntity, List<PointEntity>> persist(TimeSeriesEntity timeSeries, List<PointEntity> points) {
+		return pair(
+			persist(timeSeries),
+			points.stream().map(this::persist).collect(toList()));
+	}
+
+	private TimeSeriesEntity persist(TimeSeriesEntity timeSeries) {
+		var entity = find(timeSeries);
+		if (!entity.isPresent() || !entity.get().equals(timeSeries)) {
+			em.persist(timeSeries);
+			return timeSeries;
+		}
+		return entity.get();
+	}
+
+	private PointEntity persist(PointEntity point) {
+		var entity = find(point);
+		if (!entity.isPresent() || !entity.get().equals(point)) {
+			em.persist(point);
+			return point;
+		}
+		return entity.get();
 	}
 
 	private OffsetDateTime start(String name, Optional<Temporal> start, PeriodDuration alignment) {

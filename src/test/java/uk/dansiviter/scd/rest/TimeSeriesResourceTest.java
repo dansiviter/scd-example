@@ -1,22 +1,28 @@
 package uk.dansiviter.scd.rest;
 
+import static javax.ws.rs.core.MediaType.APPLICATION_JSON;
 import static javax.ws.rs.core.Response.Status.OK;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.is;
+import static org.hamcrest.Matchers.notNullValue;
 
 import java.math.BigDecimal;
 import java.time.Instant;
 import java.util.List;
 
 import javax.inject.Inject;
+import javax.ws.rs.client.Entity;
 import javax.ws.rs.client.WebTarget;
 import javax.ws.rs.core.GenericType;
+import javax.ws.rs.core.Response.Status;
 
 import org.junit.jupiter.api.Test;
 
 import io.helidon.microprofile.tests.junit5.HelidonTest;
+import uk.dansiviter.scd.rest.api.PointBuilder;
 import uk.dansiviter.scd.rest.api.TimeSeries;
+import uk.dansiviter.scd.rest.api.TimeSeriesBuilder;
 import uk.dansiviter.scd.rest.api.Window;
 
 @HelidonTest
@@ -52,5 +58,45 @@ class TimeSeriesResourceTest {
 			Instant.parse("2021-07-05T00:10:00Z"),
 			Instant.parse("2021-07-06T00:10:00Z"),
 			new BigDecimal("30.00"))));
+	}
+
+	@Test
+	void persist() {
+		var timeSeries = TimeSeriesBuilder.builder()
+			.name("oranges")
+			.points(List.of(PointBuilder.builder()
+					.time(Instant.now())
+					.value(BigDecimal.valueOf(1))
+					.build()))
+			.build();
+		var response = base().request().put(Entity.entity(timeSeries, APPLICATION_JSON));
+
+		assertThat(response.getStatus(), is(Status.OK.getStatusCode()));
+		var actual = response.readEntity(TimeSeries.class);
+		assertThat(actual.inserted(), notNullValue());
+		assertThat(actual.points().get(0).inserted(), notNullValue());
+	}
+
+	@Test
+	void persist_duplicates() {
+		var point = PointBuilder.builder()
+			.time(Instant.now())
+			.value(BigDecimal.valueOf(1))
+			.build();
+		var timeSeries = TimeSeriesBuilder.builder()
+			.name("oranges")
+			.points(List.of(point, point))
+			.build();
+		var response = base().request().put(Entity.entity(timeSeries, APPLICATION_JSON));
+
+		assertThat(response.getStatus(), is(Status.BAD_REQUEST.getStatusCode()));
+	}
+
+	@Test
+	void persist_nullPoints() {
+		var timeSeries = TimeSeriesBuilder.builder().name("oranges").build();
+		var response = base().request().put(Entity.entity(timeSeries, APPLICATION_JSON));
+
+		assertThat(response.getStatus(), is(Status.BAD_REQUEST.getStatusCode()));
 	}
 }

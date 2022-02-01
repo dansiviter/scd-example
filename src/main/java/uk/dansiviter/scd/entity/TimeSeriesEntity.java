@@ -2,6 +2,7 @@ package uk.dansiviter.scd.entity;
 
 import java.io.Serializable;
 import java.time.Instant;
+import java.util.List;
 import java.util.Objects;
 
 import javax.persistence.Column;
@@ -15,6 +16,9 @@ import javax.persistence.QueryHint;
 import javax.persistence.Table;
 
 import org.eclipse.persistence.annotations.ReturnInsert;
+
+import uk.dansiviter.scd.rest.api.TimeSeries;
+import uk.dansiviter.scd.rest.api.TimeSeriesBuilder;
 
 @Entity
 @IdClass(TimeSeriesEntity.TimeSeriesId.class)
@@ -48,8 +52,8 @@ public class TimeSeriesEntity implements BaseEntity {
 	@Id
 	private String name;
 	@Id
-	@Column(columnDefinition = "TIMESTAMPTZ DEFAULT (now() at time zone 'utc')", nullable = false)
-	@ReturnInsert
+	@Column(columnDefinition = "TIMESTAMPTZ DEFAULT (now() at time zone 'utc')")
+	@ReturnInsert(returnOnly = true)
 	private Instant inserted;
 	private String description;
 
@@ -76,6 +80,23 @@ public class TimeSeriesEntity implements BaseEntity {
 	public void setDescription(String description) {
 		this.description = description;
 	}
+
+	public TimeSeries toRecord(List<PointEntity> points) {
+		return TimeSeriesBuilder.builder()
+			.name(getName())
+			.inserted(getInserted())
+			.description(getDescription())
+			.points(PointEntity.from(points))
+			.build();
+	}
+
+	public static TimeSeriesEntity from(TimeSeries timeSeries) {
+		var entity = new TimeSeriesEntity();
+		entity.name = timeSeries.name();
+		entity.description = timeSeries.description();
+		return entity;
+	}
+
 
 	public static class TimeSeriesId implements Serializable {
 		private String name;

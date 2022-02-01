@@ -4,7 +4,9 @@ import java.io.Serializable;
 import java.math.BigDecimal;
 import java.time.Instant;
 import java.time.OffsetDateTime;
+import java.util.List;
 import java.util.Objects;
+import java.util.stream.Collectors;
 
 import javax.persistence.Column;
 import javax.persistence.ColumnResult;
@@ -20,7 +22,20 @@ import javax.persistence.Table;
 
 import org.eclipse.persistence.annotations.ReturnInsert;
 
+import uk.dansiviter.scd.rest.api.Point;
+import uk.dansiviter.scd.rest.api.PointBuilder;
+import uk.dansiviter.scd.rest.api.TimeSeries;
+
 @Entity
+@NamedNativeQuery(
+	name = "Point.find",
+	query = "SELECT DISTINCT ON (timeSeriesName, time) * " +
+	"FROM point " +
+	"WHERE timeSeriesName = ?1 " +
+	"AND time = ?2::TIMESTAMPTZ " +
+	"GROUP BY timeSeriesName, time, inserted " +
+	"ORDER BY timeSeriesName, time, inserted DESC",
+resultClass = PointEntity.class)
 @NamedNativeQuery(
 	name = "Point.allByTimeSeriesName",
 	query = "SELECT DISTINCT ON (timeSeriesName, time) * " +
@@ -69,8 +84,8 @@ public class PointEntity implements BaseEntity {
 	@Column(columnDefinition = "TIMESTAMPTZ", nullable = false)
 	private Instant time;
 	@Id
-	@Column(columnDefinition = "TIMESTAMPTZ DEFAULT (now() at time zone 'utc')", nullable = false)
-	@ReturnInsert
+	@Column(columnDefinition = "TIMESTAMPTZ DEFAULT (now() at time zone 'utc')")
+	@ReturnInsert(returnOnly = true)
 	private Instant inserted;
 	@Column(columnDefinition = "NUMERIC", nullable = false)
 	private BigDecimal value;
@@ -107,9 +122,28 @@ public class PointEntity implements BaseEntity {
 		this.value = value;
 	}
 
-
 	public PointId toId() {
 		return new PointId(this);
+	}
+
+	public Point toRecord() {
+		return PointBuilder.builder()
+			.time(getTime())
+			.value(getValue())
+			.inserted(getInserted())
+			.build();
+	}
+
+	public static List<Point> from(List<PointEntity> entities) {
+		return entities.stream().map(PointEntity::toRecord).collect(Collectors.toList());
+	}
+
+	public static PointEntity from(TimeSeries timeSeries, Point point) {
+		var entity = new PointEntity();
+		entity.timeSeriesName = timeSeries.name();
+		entity.time = point.time();
+		entity.value = point.value();
+		return entity;
 	}
 
 	public static class PointId implements Serializable {
