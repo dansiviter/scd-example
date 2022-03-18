@@ -3,11 +3,10 @@ package uk.dansiviter.scd.rest.api;
 import java.time.Instant;
 import java.util.List;
 
-import javax.validation.constraints.NotEmpty;
-import javax.validation.constraints.NotNull;
-import javax.validation.constraints.Size;
-
 import io.soabase.recordbuilder.core.RecordBuilder;
+import jakarta.validation.constraints.NotEmpty;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Size;
 import uk.dansiviter.scd.rest.validation.NoDuplicates;
 
 @RecordBuilder

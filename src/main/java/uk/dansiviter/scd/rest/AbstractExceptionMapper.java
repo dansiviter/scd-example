@@ -1,10 +1,9 @@
 package uk.dansiviter.scd.rest;
 
-import javax.inject.Inject;
-import javax.ws.rs.core.Response;
-import javax.ws.rs.core.Response.Status.Family;
-import javax.ws.rs.ext.ExceptionMapper;
-
+import jakarta.inject.Inject;
+import jakarta.ws.rs.core.Response;
+import jakarta.ws.rs.core.Response.Status.Family;
+import jakarta.ws.rs.ext.ExceptionMapper;
 import uk.dansiviter.scd.Pair;
 import uk.dansiviter.scd.ScdLog;
 

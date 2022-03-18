@@ -1,7 +1,7 @@
 package uk.dansiviter.scd.rest;
 
-import static javax.ws.rs.core.MediaType.APPLICATION_JSON;
-import static javax.ws.rs.core.Response.Status.OK;
+import static jakarta.ws.rs.core.MediaType.APPLICATION_JSON;
+import static jakarta.ws.rs.core.Response.Status.OK;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.is;
@@ -11,15 +11,14 @@ import java.math.BigDecimal;
 import java.time.Instant;
 import java.util.List;
 
-import javax.inject.Inject;
-import javax.ws.rs.client.Entity;
-import javax.ws.rs.client.WebTarget;
-import javax.ws.rs.core.GenericType;
-import javax.ws.rs.core.Response.Status;
-
 import org.junit.jupiter.api.Test;
 
 import io.helidon.microprofile.tests.junit5.HelidonTest;
+import jakarta.inject.Inject;
+import jakarta.ws.rs.client.Entity;
+import jakarta.ws.rs.client.WebTarget;
+import jakarta.ws.rs.core.GenericType;
+import jakarta.ws.rs.core.Response.Status;
 import uk.dansiviter.scd.rest.api.PointBuilder;
 import uk.dansiviter.scd.rest.api.TimeSeries;
 import uk.dansiviter.scd.rest.api.TimeSeriesBuilder;

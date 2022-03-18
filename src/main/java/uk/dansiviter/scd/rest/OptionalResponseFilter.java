@@ -1,16 +1,16 @@
 package uk.dansiviter.scd.rest;
 
-import static javax.ws.rs.Priorities.ENTITY_CODER;
-import static javax.ws.rs.core.Response.Status.NO_CONTENT;
+import static jakarta.ws.rs.Priorities.ENTITY_CODER;
+import static jakarta.ws.rs.core.Response.Status.NO_CONTENT;
 
 import java.io.IOException;
 import java.util.Optional;
 
-import javax.annotation.Priority;
-import javax.ws.rs.container.ContainerRequestContext;
-import javax.ws.rs.container.ContainerResponseContext;
-import javax.ws.rs.container.ContainerResponseFilter;
-import javax.ws.rs.ext.Provider;
+import jakarta.annotation.Priority;
+import jakarta.ws.rs.container.ContainerRequestContext;
+import jakarta.ws.rs.container.ContainerResponseContext;
+import jakarta.ws.rs.container.ContainerResponseFilter;
+import jakarta.ws.rs.ext.Provider;
 
 /**
  * Handles {@link Optional} responses.

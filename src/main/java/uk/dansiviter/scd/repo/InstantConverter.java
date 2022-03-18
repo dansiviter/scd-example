@@ -3,8 +3,8 @@ package uk.dansiviter.scd.repo;
 import java.sql.Timestamp;
 import java.time.Instant;
 
-import javax.persistence.AttributeConverter;
-import javax.persistence.Converter;
+import jakarta.persistence.AttributeConverter;
+import jakarta.persistence.Converter;
 
 @Converter(autoApply = true)
 public class InstantConverter implements AttributeConverter<Instant, Timestamp> {

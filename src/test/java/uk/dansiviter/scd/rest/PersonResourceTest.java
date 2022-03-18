@@ -1,11 +1,11 @@
 package uk.dansiviter.scd.rest;
 
-import static javax.ws.rs.client.Entity.entity;
-import static javax.ws.rs.core.HttpHeaders.ETAG;
-import static javax.ws.rs.core.MediaType.APPLICATION_JSON;
-import static javax.ws.rs.core.Response.Status.NOT_MODIFIED;
-import static javax.ws.rs.core.Response.Status.NO_CONTENT;
-import static javax.ws.rs.core.Response.Status.OK;
+import static jakarta.ws.rs.client.Entity.entity;
+import static jakarta.ws.rs.core.HttpHeaders.ETAG;
+import static jakarta.ws.rs.core.MediaType.APPLICATION_JSON;
+import static jakarta.ws.rs.core.Response.Status.NOT_MODIFIED;
+import static jakarta.ws.rs.core.Response.Status.NO_CONTENT;
+import static jakarta.ws.rs.core.Response.Status.OK;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.greaterThan;
 import static org.hamcrest.Matchers.hasItem;
@@ -17,15 +17,14 @@ import static uk.dansiviter.scd.hamcrest.HasRecordComponentWithValue.hasRecordCo
 
 import java.util.List;
 
-import javax.inject.Inject;
-import javax.ws.rs.client.Entity;
-import javax.ws.rs.client.WebTarget;
-import javax.ws.rs.core.EntityTag;
-import javax.ws.rs.core.GenericType;
-
 import org.junit.jupiter.api.Test;
 
 import io.helidon.microprofile.tests.junit5.HelidonTest;
+import jakarta.inject.Inject;
+import jakarta.ws.rs.client.Entity;
+import jakarta.ws.rs.client.WebTarget;
+import jakarta.ws.rs.core.EntityTag;
+import jakarta.ws.rs.core.GenericType;
 import uk.dansiviter.scd.rest.api.Person;
 import uk.dansiviter.scd.rest.api.PersonBuilder;
 
@@ -51,7 +50,7 @@ class PersonResourceTest {
 		assertThat(actual.getStatus(), is(OK.getStatusCode()));
 		var created0 = actual.readEntity(Person.class);
 		assertThat(created0.inserted(), notNullValue());
-		assertThat(actual.getHeaderString(ETAG), is(eTag(created0).toString()));
+		assertThat(actual.getHeaderString(ETAG), is(ETagFilter.toString(eTag(created0))));
 
 		// put newer record with a change
 		person = person.withAge(62);
@@ -60,7 +59,7 @@ class PersonResourceTest {
 		var created1 = actual.readEntity(Person.class);
 		assertThat(created0, is(not(created1)));
 		assertThat(created0.inserted(), is(not(created1.inserted())));
-		assertThat(actual.getHeaderString(ETAG), is(not(eTag(created0).toString())));
+		assertThat(actual.getHeaderString(ETAG), is(not(ETagFilter.toString(eTag(created0)))));
 
 		// try put, idempotent
 		actual = base().request().put(Entity.entity(person, APPLICATION_JSON));
@@ -68,7 +67,7 @@ class PersonResourceTest {
 		var created2 = actual.readEntity(Person.class);
 		assertThat(created1, is(created2));
 		assertThat(created1.inserted(), is(created2.inserted()));
-		assertThat(actual.getHeaderString(ETAG), is(eTag(created1).toString()));
+		assertThat(actual.getHeaderString(ETAG), is(ETagFilter.toString(eTag(created1))));
 
 		// get 'Glenn' audit
 		actual = base().path("Glenn/audit").request().get();

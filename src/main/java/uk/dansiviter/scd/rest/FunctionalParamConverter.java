@@ -2,7 +2,7 @@ package uk.dansiviter.scd.rest;
 
 import java.util.function.Function;
 
-import javax.ws.rs.ext.ParamConverter;
+import jakarta.ws.rs.ext.ParamConverter;
 
 public class FunctionalParamConverter<T> implements ParamConverter<T> {
 	private final Function<String, T> from;
