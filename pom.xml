@@ -34,6 +34,21 @@
 		</repository>
 	</repositories>
 
+	<dependencyManagement>
+		<dependencies>
+			<dependency>
+				<groupId>jakarta.json.bind</groupId>
+				<artifactId>jakarta.json.bind-api</artifactId>
+				<version>3.0.0-RC1</version>
+			</dependency>
+			<dependency>
+				<groupId>org.eclipse</groupId>
+				<artifactId>yasson</artifactId>
+				<version>3.0.0-RC1</version>
+			</dependency>
+		</dependencies>
+	</dependencyManagement>
+
 	<dependencies>
 		<dependency>
 			<groupId>uk.dansiviter.juli</groupId>
@@ -77,7 +92,7 @@
 
 		<dependency>
 			<groupId>org.glassfish.jersey.media</groupId>
-			<artifactId>jersey-media-json-jackson</artifactId>
+			<artifactId>jersey-media-json-binding</artifactId>
 		</dependency>
 		<dependency>
 			<groupId>org.glassfish.jersey.ext</groupId>
