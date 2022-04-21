@@ -17,7 +17,7 @@ jobs:
         java-version: 17
         cache: 'maven'
     - name: Initialize CodeQL
-      uses: github/codeql-action/init@v1
+      uses: github/codeql-action/init@v2
       with:
         languages: java
     - name: Build
@@ -26,4 +26,4 @@ jobs:
       run: >
         mvn -B -ntp verify
     - name: Perform CodeQL Analysis
-      uses: github/codeql-action/analyze@v1
+      uses: github/codeql-action/analyze@v2
