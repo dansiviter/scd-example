@@ -1,22 +1,22 @@
 package uk.dansiviter.scd.rest;
 
-import static javax.ws.rs.HttpMethod.GET;
-import static javax.ws.rs.HttpMethod.PUT;
-import static javax.ws.rs.Priorities.HEADER_DECORATOR;
-import static javax.ws.rs.core.HttpHeaders.ETAG;
-import static javax.ws.rs.core.Response.Status.OK;
+import static jakarta.ws.rs.HttpMethod.GET;
+import static jakarta.ws.rs.HttpMethod.PUT;
+import static jakarta.ws.rs.Priorities.HEADER_DECORATOR;
+import static jakarta.ws.rs.core.HttpHeaders.ETAG;
+import static jakarta.ws.rs.core.Response.Status.OK;
 
 import java.util.Set;
 
-import javax.annotation.Priority;
-import javax.inject.Inject;
-import javax.ws.rs.container.ContainerRequestContext;
-import javax.ws.rs.container.ContainerResponseContext;
-import javax.ws.rs.container.ContainerResponseFilter;
-import javax.ws.rs.core.EntityTag;
-import javax.ws.rs.core.Response.ResponseBuilder;
-import javax.ws.rs.ext.Provider;
-
+import jakarta.annotation.Priority;
+import jakarta.inject.Inject;
+import jakarta.ws.rs.container.ContainerRequestContext;
+import jakarta.ws.rs.container.ContainerResponseContext;
+import jakarta.ws.rs.container.ContainerResponseFilter;
+import jakarta.ws.rs.core.EntityTag;
+import jakarta.ws.rs.core.Response.ResponseBuilder;
+import jakarta.ws.rs.ext.Provider;
+import jakarta.ws.rs.ext.RuntimeDelegate;
 import uk.dansiviter.scd.repo.KeyUtil;
 
 @ETag
@@ -43,7 +43,7 @@ public class ETagFilter implements ContainerResponseFilter {
 		if (builder != null) {
 			copy(builder, res);
 		} else {
-			res.getHeaders().add(ETAG, eTag.toString());
+			res.getHeaders().add(ETAG, toString(eTag));
 		}
 	}
 
@@ -52,5 +52,9 @@ public class ETagFilter implements ContainerResponseFilter {
 		res.setEntity(null);
 		res.setStatusInfo(response.getStatusInfo());
 		response.getHeaders().forEach(res.getHeaders()::put);
+	}
+
+	static String toString(EntityTag eTag) {
+		return RuntimeDelegate.getInstance().createHeaderDelegate(EntityTag.class).toString(eTag);
 	}
 }

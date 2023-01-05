@@ -4,26 +4,22 @@ import java.io.Serializable;
 import java.math.BigDecimal;
 import java.time.Instant;
 import java.time.OffsetDateTime;
-import java.util.List;
 import java.util.Objects;
-import java.util.stream.Collectors;
-
-import javax.persistence.Column;
-import javax.persistence.ColumnResult;
-import javax.persistence.ConstructorResult;
-import javax.persistence.Entity;
-import javax.persistence.Id;
-import javax.persistence.IdClass;
-import javax.persistence.Index;
-import javax.persistence.NamedNativeQuery;
-import javax.persistence.NamedQuery;
-import javax.persistence.SqlResultSetMapping;
-import javax.persistence.Table;
 
 import org.eclipse.persistence.annotations.ReturnInsert;
 
+import jakarta.persistence.Column;
+import jakarta.persistence.ColumnResult;
+import jakarta.persistence.ConstructorResult;
+import jakarta.persistence.Entity;
+import jakarta.persistence.Id;
+import jakarta.persistence.IdClass;
+import jakarta.persistence.Index;
+import jakarta.persistence.NamedNativeQuery;
+import jakarta.persistence.NamedQuery;
+import jakarta.persistence.SqlResultSetMapping;
+import jakarta.persistence.Table;
 import uk.dansiviter.scd.rest.api.Point;
-import uk.dansiviter.scd.rest.api.PointBuilder;
 import uk.dansiviter.scd.rest.api.TimeSeries;
 
 @Entity
@@ -124,18 +120,6 @@ public class PointEntity implements BaseEntity {
 
 	public PointId toId() {
 		return new PointId(this);
-	}
-
-	public Point toRecord() {
-		return PointBuilder.builder()
-			.time(getTime())
-			.value(getValue())
-			.inserted(getInserted())
-			.build();
-	}
-
-	public static List<Point> from(List<PointEntity> entities) {
-		return entities.stream().map(PointEntity::toRecord).collect(Collectors.toList());
 	}
 
 	public static PointEntity from(TimeSeries timeSeries, Point point) {

@@ -2,23 +2,19 @@ package uk.dansiviter.scd.entity;
 
 import java.io.Serializable;
 import java.time.Instant;
-import java.util.List;
 import java.util.Objects;
-
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.Id;
-import javax.persistence.IdClass;
-import javax.persistence.Index;
-import javax.persistence.NamedNativeQuery;
-import javax.persistence.NamedQuery;
-import javax.persistence.QueryHint;
-import javax.persistence.Table;
 
 import org.eclipse.persistence.annotations.ReturnInsert;
 
-import uk.dansiviter.scd.rest.api.TimeSeries;
-import uk.dansiviter.scd.rest.api.TimeSeriesBuilder;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.Id;
+import jakarta.persistence.IdClass;
+import jakarta.persistence.Index;
+import jakarta.persistence.NamedNativeQuery;
+import jakarta.persistence.NamedQuery;
+import jakarta.persistence.QueryHint;
+import jakarta.persistence.Table;
 
 @Entity
 @IdClass(TimeSeriesEntity.TimeSeriesId.class)
@@ -80,23 +76,6 @@ public class TimeSeriesEntity implements BaseEntity {
 	public void setDescription(String description) {
 		this.description = description;
 	}
-
-	public TimeSeries toRecord(List<PointEntity> points) {
-		return TimeSeriesBuilder.builder()
-			.name(getName())
-			.inserted(getInserted())
-			.description(getDescription())
-			.points(PointEntity.from(points))
-			.build();
-	}
-
-	public static TimeSeriesEntity from(TimeSeries timeSeries) {
-		var entity = new TimeSeriesEntity();
-		entity.name = timeSeries.name();
-		entity.description = timeSeries.description();
-		return entity;
-	}
-
 
 	public static class TimeSeriesId implements Serializable {
 		private String name;

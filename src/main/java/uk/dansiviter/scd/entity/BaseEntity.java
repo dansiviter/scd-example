@@ -4,8 +4,7 @@ import java.io.Serializable;
 import java.util.UUID;
 import java.util.function.Supplier;
 
-import javax.persistence.PreUpdate;
-
+import jakarta.persistence.PreUpdate;
 import uk.dansiviter.uuid.UuidFactories;
 
 public interface BaseEntity extends Serializable {

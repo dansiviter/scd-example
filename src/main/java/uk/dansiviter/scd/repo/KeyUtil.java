@@ -6,7 +6,7 @@ import static java.util.stream.StreamSupport.stream;
 import java.util.Optional;
 import java.util.OptionalLong;
 
-import javax.enterprise.context.ApplicationScoped;
+import jakarta.enterprise.context.ApplicationScoped;
 
 @ApplicationScoped
 public class KeyUtil {

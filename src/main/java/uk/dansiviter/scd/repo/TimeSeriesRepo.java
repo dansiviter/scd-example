@@ -15,15 +15,14 @@ import java.time.temporal.Temporal;
 import java.util.List;
 import java.util.Optional;
 
-import javax.enterprise.context.ApplicationScoped;
-import javax.inject.Inject;
-import javax.persistence.EntityManager;
-import javax.persistence.NoResultException;
-import javax.persistence.PersistenceContext;
-import javax.transaction.Transactional;
-
 import org.threeten.extra.PeriodDuration;
 
+import jakarta.enterprise.context.ApplicationScoped;
+import jakarta.inject.Inject;
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.NoResultException;
+import jakarta.persistence.PersistenceContext;
+import jakarta.transaction.Transactional;
 import uk.dansiviter.scd.Pair;
 import uk.dansiviter.scd.ScdLog;
 import uk.dansiviter.scd.entity.PointEntity;

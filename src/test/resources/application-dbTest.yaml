@@ -1,0 +1,8 @@
+javax:
+  sql:
+    DataSource:
+      default:
+        jdbcUrl: jdbc:tc:postgresql:14.2:///test
+        dataSource:
+          user: test
+          password: test

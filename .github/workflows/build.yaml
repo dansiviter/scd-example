@@ -9,21 +9,22 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - name: Checkout project
-      uses: actions/checkout@v2
+      uses: actions/checkout@v3
+
     - name: Set up JDK
       uses: actions/setup-java@v2
       with:
-        distribution: 'adopt'
+        distribution: 'temurin'
         java-version: 17
         cache: 'maven'
+
     - name: Initialize CodeQL
-      uses: github/codeql-action/init@v1
+      uses: github/codeql-action/init@v2
       with:
         languages: java
-    - name: Build
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      run: >
-        mvn -B -ntp verify
+
+    - name: Autobuild
+      uses: github/codeql-action/autobuild@v2
+
     - name: Perform CodeQL Analysis
-      uses: github/codeql-action/analyze@v1
+      uses: github/codeql-action/analyze@v2
