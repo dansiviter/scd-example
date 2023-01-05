@@ -6,6 +6,7 @@ import static uk.dansiviter.scd.rest.api.PersonBuilder.builder;
 import java.time.Instant;
 import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 import io.soabase.recordbuilder.core.RecordBuilder;
@@ -17,8 +18,8 @@ import uk.dansiviter.scd.entity.PersonEntity;
 @RecordBuilder
 public record Person(
 	@NotNull @Size(min = 3, max = 32) String name,
-	Instant inserted,
-	@Min(0) int age)
+	@Min(0) int age,
+	Optional<Instant> inserted)
 implements PersonBuilder.With {
 
 	public static Person from(PersonEntity entity) {
@@ -26,7 +27,7 @@ implements PersonBuilder.With {
 		return builder()
 			.age(entity.getAge())
 			.name(entity.getName())
-			.inserted(entity.getInserted())
+			.inserted(Optional.of(entity.getInserted()))
 			.build();
 	}
 
@@ -40,6 +41,6 @@ implements PersonBuilder.With {
 	}
 
 	public PersonEntity toEntity() {
-		return new PersonEntity(name, age, inserted);
+		return new PersonEntity(name, age);
 	}
 }

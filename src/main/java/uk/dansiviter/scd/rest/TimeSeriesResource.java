@@ -34,27 +34,27 @@ public class TimeSeriesResource {
 	private TimeSeriesRepo repo;
 
 	@GET
-	public List<TimeSeries> timeSeries() {
+	public List<TimeSeries> get() {
 		var stream = repo.timeSeries().stream();
 		return stream.map(this::map).collect(toList());
 	}
 
 	@PUT
-	public TimeSeries timeseries(@Valid TimeSeries timeSeries) {
-		var pointEntities = timeSeries.points().stream().map(p -> PointEntity.from(timeSeries, p)).collect(toList());
-		var pair = repo.persist(TimeSeriesEntity.from(timeSeries), pointEntities);
-		return pair.first().toRecord(pair.second());
+	public TimeSeries put(@Valid TimeSeries body) {
+		var pointEntities = body.points().stream().map(p -> PointEntity.from(body, p)).collect(toList());
+		var pair = repo.persist(TimeSeries.toEntity(body), pointEntities);
+		return TimeSeries.from(pair.first(), pair.second());
 	}
 
 	private TimeSeries map(TimeSeriesEntity ts) {
 		var points = repo.points(ts.getName());
-		return ts.toRecord(points);
+		return  TimeSeries.from(ts, points);
 	}
 
 	@GET
 	@Path("{timeSeriesName}/points")
 	public List<Point> points(@PathParam("timeSeriesName") String timeSeriesName) {
-		return PointEntity.from(repo.points(timeSeriesName));
+		return Point.from(repo.points(timeSeriesName));
 	}
 
 	@GET

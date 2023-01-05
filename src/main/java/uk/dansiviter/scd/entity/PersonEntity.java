@@ -76,10 +76,9 @@ public class PersonEntity implements BaseEntity {
 
 	public PersonEntity() { }
 
-	public PersonEntity(String name, int age, Instant inserted) {
+	public PersonEntity(String name, int age) {
 		this.name = name;
 		this.age = age;
-		this.inserted = inserted;
 	}
 
 	public String getName() {

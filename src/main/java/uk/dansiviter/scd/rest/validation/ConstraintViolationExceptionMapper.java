@@ -22,13 +22,13 @@ public class ConstraintViolationExceptionMapper extends AbstractExceptionMapper<
 	}
 
   private static String prepareMessage(ConstraintViolationException ex) {
-		var buf = new StringBuilder("Validation failed! [");
+		var buf = new StringBuilder("Validation failed:");
 		ex.getConstraintViolations().forEach(cv -> append(buf, cv));
 		buf.setLength(buf.length() - 1);  // trim last comma
-		return buf.append(']').toString();
+		return buf.append('.').toString();
   }
 
 	private static void append(StringBuilder buf, ConstraintViolation<?> cv) {
-		buf.append(cv.getPropertyPath()).append(": ").append(cv.getMessage()).append(',');
+		buf.append("\n - [").append(cv.getPropertyPath()).append("] ").append(cv.getMessage()).append(",");
 	}
 }

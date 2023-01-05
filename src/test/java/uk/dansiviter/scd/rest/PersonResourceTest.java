@@ -19,16 +19,20 @@ import java.util.List;
 
 import org.junit.jupiter.api.Test;
 
+import io.helidon.microprofile.tests.junit5.Configuration;
 import io.helidon.microprofile.tests.junit5.HelidonTest;
 import jakarta.inject.Inject;
+import jakarta.json.bind.JsonbBuilder;
 import jakarta.ws.rs.client.Entity;
 import jakarta.ws.rs.client.WebTarget;
 import jakarta.ws.rs.core.EntityTag;
 import jakarta.ws.rs.core.GenericType;
+import uk.dansiviter.scd.rest.api.ApiError;
 import uk.dansiviter.scd.rest.api.Person;
 import uk.dansiviter.scd.rest.api.PersonBuilder;
 
 @HelidonTest
+@Configuration(configSources = "application-dbTest.yaml")
 class PersonResourceTest {
 	private static final String BASE = "v1alpha/people";
 
@@ -73,7 +77,7 @@ class PersonResourceTest {
 		actual = base().path("Glenn/audit").request().get();
 		var audit = actual.readEntity(new GenericType<List<Person>>() {});
 		assertThat(audit, hasSize(2));
-		assertThat(audit.get(0).inserted(), greaterThan(audit.get(1).inserted()));
+		assertThat(audit.get(0).inserted().get(), greaterThan(audit.get(1).inserted().get()));
 
 		// check latest is correct
 		actual = base().path("Glenn").request().get();
@@ -109,8 +113,18 @@ class PersonResourceTest {
 		assertThat(allAudit, hasSize(9));
 
 		// check we can get value at a particular point in time (i.e. first one)
-		actual = base().path("Glenn").queryParam("instant", created0.inserted()).request().get();
+		actual = base().path("Glenn")
+			.queryParam("instant", created0.inserted().orElseThrow())
+			.request().get();
 		assertThat(actual.readEntity(Person.class), is(created0));
+	}
+
+	@Test
+	void persons_bad() {
+		var actual = base().request().put(Entity.entity("{\"age\":\"abc\"}", APPLICATION_JSON));
+
+		var error = actual.readEntity(ApiError.class);
+		assertThat(error.msg().orElseThrow(), is("Error deserializing object from entity stream."));
 	}
 
 	private static EntityTag eTag(Person person) {

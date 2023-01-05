@@ -13,6 +13,7 @@ import java.util.List;
 
 import org.junit.jupiter.api.Test;
 
+import io.helidon.microprofile.tests.junit5.Configuration;
 import io.helidon.microprofile.tests.junit5.HelidonTest;
 import jakarta.inject.Inject;
 import jakarta.ws.rs.client.Entity;
@@ -25,6 +26,7 @@ import uk.dansiviter.scd.rest.api.TimeSeriesBuilder;
 import uk.dansiviter.scd.rest.api.Window;
 
 @HelidonTest
+@Configuration(configSources = "application-dbTest.yaml")
 class TimeSeriesResourceTest {
 	private static final String BASE = "v1alpha/timeseries";
 

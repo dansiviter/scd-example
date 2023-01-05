@@ -4,7 +4,7 @@
 	<parent>
 		<groupId>io.helidon.applications</groupId>
 		<artifactId>helidon-mp</artifactId>
-		<version>3.0.0-M1</version>
+		<version>3.1.0</version>
 	</parent>
 	<groupId>uk.dansiviter.scd</groupId>
 	<artifactId>scd-example</artifactId>
@@ -13,16 +13,16 @@
 	<name>${project.artifactId}</name>
 
 	<properties>
-		<java.version>17</java.version>
+		<!-- <java.version>17</java.version>
 		<maven.compiler.release>${java.version}</maven.compiler.release>
 		<maven.compiler.source>${java.version}</maven.compiler.source>
-		<maven.compiler.target>${java.version}</maven.compiler.target>
+		<maven.compiler.target>${java.version}</maven.compiler.target> -->
 		<!-- <maven.compiler.showWarnings>true</maven.compiler.showWarnings>
 		<maven.compiler.verbose>true</maven.compiler.verbose> -->
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
 
-		<version.juli>[0.0,1.0)</version.juli>
+		<version.jule>0.7.0-SNAPSHOT</version.jule>
 	</properties>
 
 	<repositories>
@@ -39,26 +39,26 @@
 			<dependency>
 				<groupId>jakarta.json.bind</groupId>
 				<artifactId>jakarta.json.bind-api</artifactId>
-				<version>3.0.0-RC1</version>
+				<version>3.0.0</version>
 			</dependency>
 			<dependency>
 				<groupId>org.eclipse</groupId>
 				<artifactId>yasson</artifactId>
-				<version>3.0.0-RC1</version>
+				<version>3.0.2</version>
 			</dependency>
 		</dependencies>
 	</dependencyManagement>
 
 	<dependencies>
 		<dependency>
-			<groupId>uk.dansiviter.juli</groupId>
-			<artifactId>juli-cdi</artifactId>
-			<version>${version.juli}</version>
+			<groupId>uk.dansiviter.jule</groupId>
+			<artifactId>jule-cdi</artifactId>
+			<version>${version.jule}</version>
 		</dependency>
 		<dependency>
-			<groupId>uk.dansiviter.juli</groupId>
-			<artifactId>juli-processor</artifactId>
-			<version>${version.juli}</version>
+			<groupId>uk.dansiviter.jule</groupId>
+			<artifactId>jule-processor</artifactId>
+			<version>${version.jule}</version>
 			<scope>provided</scope>
 		</dependency>
 		<dependency>
@@ -68,7 +68,7 @@
 		<dependency>
 			<groupId>org.threeten</groupId>
 			<artifactId>threeten-extra</artifactId>
-			<version>1.7.0</version>
+			<version>1.7.2</version>
 		</dependency>
 		<dependency>
 			<groupId>uk.dansiviter.uuid</groupId>
@@ -78,7 +78,7 @@
 		<dependency>
 			<groupId>io.soabase.record-builder</groupId>
 			<artifactId>record-builder-processor</artifactId>
-			<version>29</version>
+			<version>34</version>
 			<scope>provided</scope>
 		</dependency>
 		<dependency>
@@ -93,6 +93,7 @@
 		<dependency>
 			<groupId>org.glassfish.jersey.media</groupId>
 			<artifactId>jersey-media-json-binding</artifactId>
+			<version>3.1.0</version>
 		</dependency>
 		<dependency>
 			<groupId>org.glassfish.jersey.ext</groupId>
@@ -100,20 +101,15 @@
 		</dependency>
 
 		<dependency>
-			<groupId>com.fasterxml.jackson.datatype</groupId>
-			<artifactId>jackson-datatype-jsr310</artifactId>
+			<groupId>com.thoughtworks.paranamer</groupId>
+			<artifactId>paranamer</artifactId>
+			<version>2.8</version>
 		</dependency>
 
 		<dependency>
 			<groupId>org.postgresql</groupId>
 			<artifactId>postgresql</artifactId>
-			<version>42.3.8</version>
-		</dependency>
-
-		<dependency>
-			<groupId>org.testcontainers</groupId>
-			<artifactId>postgresql</artifactId>
-			<version>1.17.1</version>
+			<version>42.5.1</version>
 		</dependency>
 
 		<dependency>
@@ -152,7 +148,7 @@
 		<dependency>
 			<groupId>org.junit.jupiter</groupId>
 			<artifactId>junit-jupiter</artifactId>
-			<version>[5.7.1,5.8)</version>
+			<version>[5,6)</version>
 			<scope>test</scope>
 		</dependency>
 		<dependency>
@@ -164,6 +160,12 @@
 		<dependency>
 			<groupId>io.helidon.microprofile.tests</groupId>
 			<artifactId>helidon-microprofile-tests-junit5</artifactId>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.testcontainers</groupId>
+			<artifactId>postgresql</artifactId>
+			<version>1.17.6</version>
 			<scope>test</scope>
 		</dependency>
 	</dependencies>
@@ -179,7 +181,7 @@
 					</execution>
 				</executions>
 			</plugin>
-			<plugin>
+			<!-- <plugin>
 				<groupId>org.jboss.jandex</groupId>
 				<artifactId>jandex-maven-plugin</artifactId>
 			</plugin>
@@ -201,7 +203,7 @@
 						<basePackage>uk.dansiviter.scd.entity</basePackage>
 					</basePackages>
 				</configuration>
-			</plugin>
+			</plugin> -->
 		</plugins>
 	</build>
 

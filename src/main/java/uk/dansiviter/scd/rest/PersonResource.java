@@ -7,6 +7,8 @@ import java.util.List;
 import java.util.Optional;
 
 import jakarta.inject.Inject;
+import jakarta.json.bind.JsonbBuilder;
+import jakarta.validation.Valid;
 import jakarta.ws.rs.Consumes;
 import jakarta.ws.rs.GET;
 import jakarta.ws.rs.PUT;
@@ -54,7 +56,23 @@ public class PersonResource {
 
 	@PUT
 	@ETag
-	public Person put(Person person) {
-		return Person.from(repo.persist(person.toEntity()));
+	public Person put(@Valid Person body) {
+		return Person.from(repo.persist(body.toEntity()));
+	}
+
+
+	public static void main(String[] args) {
+		var jsonb = JsonbBuilder.create();
+		var myObject = new MyObject(Optional.of("foo"));
+		var json = jsonb.toJson(myObject);
+		System.out.println(json);
+		myObject = jsonb.fromJson(json, MyObject.class);
+		System.out.println("str1=" + myObject.str1().get());
+	}
+
+	public static record MyObject(Optional<String> str1) {
+		public MyObject() {
+			this(Optional.empty());
+		}
 	}
 }
